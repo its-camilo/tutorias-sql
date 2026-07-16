@@ -1,0 +1,26 @@
+.paragraph {
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  line-height: 1.7;
+  margin-bottom: 0.875rem;
+}
+
+.paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.list {
+  margin: 0.75rem 0 1rem;
+  padding-left: 1.25rem;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.list li {
+  margin-bottom: 0.375rem;
+  line-height: 1.65;
+}
+
+.list li::marker {
+  color: var(--color-accent);
+}

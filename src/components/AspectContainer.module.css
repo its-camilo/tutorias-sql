@@ -1,0 +1,20 @@
+.wrapper {
+  width: 100%;
+  max-width: var(--content-max-width);
+}
+
+.frame {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 24px 48px -12px rgba(0, 0, 0, 0.5);
+}
+
+.viewport {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}

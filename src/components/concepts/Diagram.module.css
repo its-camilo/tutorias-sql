@@ -1,0 +1,189 @@
+.figure {
+  margin: 1.25rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.canvas {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.caption {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  padding: 0.625rem 1rem;
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+}
+
+.boxFill {
+  fill: var(--color-surface-raised);
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.boxFillAccent {
+  fill: rgba(245, 158, 11, 0.12);
+  stroke: rgba(245, 158, 11, 0.4);
+  stroke-width: 1;
+}
+
+.boxFillHighlight {
+  fill: rgba(56, 189, 248, 0.1);
+  stroke: rgba(56, 189, 248, 0.35);
+  stroke-width: 1;
+}
+
+.label {
+  fill: var(--color-text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.sublabel {
+  fill: var(--color-text-muted);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 9px;
+}
+
+.sublabelSmall {
+  fill: var(--color-text-muted);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 8px;
+}
+
+.arrow {
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.arrowDashed {
+  stroke: var(--color-highlight);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  fill: none;
+}
+
+.vennLeft {
+  fill: rgba(56, 189, 248, 0.15);
+  stroke: rgba(56, 189, 248, 0.4);
+  stroke-width: 1;
+}
+
+.vennRight {
+  fill: rgba(245, 158, 11, 0.12);
+  stroke: rgba(245, 158, 11, 0.4);
+  stroke-width: 1;
+}
+
+.vennMuted {
+  fill: rgba(148, 163, 184, 0.08);
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.vennOverlap {
+  fill: rgba(134, 239, 172, 0.25);
+}
+
+.vennLabel {
+  fill: var(--color-text-muted);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+}
+
+.vennLabelAccent {
+  fill: var(--color-text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.diagramTitle {
+  fill: var(--color-accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.factBox {
+  fill: rgba(245, 158, 11, 0.18);
+  stroke: rgba(245, 158, 11, 0.5);
+  stroke-width: 1.5;
+}
+
+.factLabel {
+  fill: var(--color-accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.factSublabel {
+  fill: var(--color-text-muted);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+}
+
+.dimBox {
+  fill: var(--color-surface-raised);
+  stroke: rgba(56, 189, 248, 0.35);
+  stroke-width: 1;
+}
+
+.dimLabel {
+  fill: var(--color-highlight);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.dimLabelSmall {
+  fill: var(--color-highlight);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 9px;
+}
+
+.connector {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.plsqlSection {
+  fill: var(--color-surface-raised);
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.plsqlKeyword {
+  fill: var(--color-highlight);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.plsqlDesc {
+  fill: var(--color-text-muted);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+}
+
+.commitBox {
+  fill: rgba(134, 239, 172, 0.12);
+  stroke: rgba(134, 239, 172, 0.4);
+  stroke-width: 1;
+}
