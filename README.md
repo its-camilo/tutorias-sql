@@ -34,16 +34,16 @@ Abre [http://localhost:5173](http://localhost:5173) en el navegador.
 
 ## Despliegue (GitHub Pages)
 
-El sitio se despliega automáticamente al hacer push a `main` mediante GitHub Actions.
+El sitio se despliega automáticamente al hacer push a `main` mediante GitHub Actions (rama `gh-pages`).
 
 - Workflow: `.github/workflows/deploy.yml`
 - Base path: `/tutorias-sql/` (configurado en `vite.config.ts`)
-- URL: `https://its-camilo.github.io/tutorias-sql/`
+- URL: [https://its-camilo.github.io/tutorias-sql/](https://its-camilo.github.io/tutorias-sql/)
+
+**Primera vez:** en el repositorio ve a **Settings → Pages → Build and deployment** y selecciona **Deploy from a branch**, rama `gh-pages`, carpeta `/ (root)`.
 
 Para desplegar manualmente:
 
 ```bash
-git push origin main
+npm run deploy
 ```
-
-O desde la pestaña **Actions** → **Deploy to GitHub Pages** → **Run workflow**.
