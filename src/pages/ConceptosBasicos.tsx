@@ -6,10 +6,11 @@ import styles from './ConceptosBasicos.module.css'
 
 export default function ConceptosBasicos() {
   const [activeLevel, setActiveLevel] = useState(conceptLevels[0].id)
+  const activeLevelData =
+    conceptLevels.find((level) => level.id === activeLevel) ?? conceptLevels[0]
 
   const handleLevelSelect = useCallback((levelId: string) => {
     setActiveLevel(levelId)
-    document.getElementById(levelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
 
   return (
@@ -32,9 +33,7 @@ export default function ConceptosBasicos() {
       />
 
       <div className={styles.body}>
-        {conceptLevels.map((level) => (
-          <ConceptLevel key={level.id} level={level} />
-        ))}
+        <ConceptLevel key={activeLevelData.id} level={activeLevelData} />
       </div>
     </div>
   )

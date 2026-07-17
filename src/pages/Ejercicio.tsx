@@ -6,13 +6,11 @@ import styles from './Ejercicio.module.css'
 
 export default function Ejercicio() {
   const [activeSchema, setActiveSchema] = useState(exerciseSchemas[0].id)
+  const activeSchemaData =
+    exerciseSchemas.find((schema) => schema.id === activeSchema) ?? exerciseSchemas[0]
 
   const handleSchemaSelect = useCallback((schemaId: 'co' | 'sh') => {
     setActiveSchema(schemaId)
-    document.getElementById(`schema-${schemaId}`)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
   }, [])
 
   return (
@@ -45,9 +43,7 @@ export default function Ejercicio() {
       </nav>
 
       <div className={styles.schemas}>
-        {exerciseSchemas.map((schema) => (
-          <SchemaSection key={schema.id} schema={schema} />
-        ))}
+        <SchemaSection key={activeSchemaData.id} schema={activeSchemaData} />
       </div>
     </div>
   )
