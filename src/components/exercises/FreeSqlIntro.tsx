@@ -8,7 +8,8 @@ export default function FreeSqlIntro() {
       </p>
       <h2 className={styles.heading}>Practica con Oracle FreeSQL</h2>
       <p className={styles.lead}>
-        Los ejercicios se realizan en{' '}
+        Ejercicios pensados para el perfil <strong>Comercial GenO</strong>: ejecuta
+        consultas en{' '}
         <a
           href="https://freesql.com"
           target="_blank"
@@ -16,9 +17,9 @@ export default function FreeSqlIntro() {
           className={styles.link}
         >
           freesql.com
-        </a>
-        , el entorno gratuito de Oracle para escribir y ejecutar SQL desde el navegador,
-        sin instalar nada.
+        </a>{' '}
+        y, al final de cada uno, explica el resultado como se lo dirías a un cliente —
+        en una frase, sin jerga. No necesitas instalar nada.
       </p>
 
       <div className={styles.steps}>
@@ -53,10 +54,11 @@ export default function FreeSqlIntro() {
         <div className={styles.step}>
           <span className={styles.stepNum}>4</span>
           <div>
-            <h3 className={styles.stepTitle}>Ejecuta paso a paso</h3>
+            <h3 className={styles.stepTitle}>Ejecuta y explica</h3>
             <p className={styles.stepText}>
-              Copia cada paso del carrusel al Worksheet y presiona{' '}
-              <strong>Run Script</strong> (F5) para ver el resultado antes de avanzar.
+              Copia cada paso al Worksheet, ejecuta con <strong>Run Script</strong>{' '}
+              (F5) y responde la pregunta <strong>Explícaselo a un cliente</strong> de
+              cada ejercicio.
             </p>
           </div>
         </div>

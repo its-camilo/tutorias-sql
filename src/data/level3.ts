@@ -4,17 +4,19 @@ export const level3: ConceptLevel = {
   id: 'nivel-3',
   number: 3,
   title: 'Modelado para reporting',
-  subtitle: 'Diseño dimensional para reportes rápidos en ERP — la clave para entender data warehouses.',
+  subtitle:
+    'Hechos, dimensiones y esquema estrella: el idioma de los reportes gerenciales en Oracle.',
   concepts: [
     {
       id: 'fact-vs-dimension',
       title: 'Tabla de hechos vs tabla de dimensión',
-      summary: 'Los hechos registran transacciones medibles; las dimensiones describen el contexto de quién, qué, cuándo y dónde.',
+      summary:
+        'Los hechos miden lo que pasó (montos, cantidades); las dimensiones explican quién, qué, cuándo y dónde.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'En el modelado dimensional, separas dos tipos de tablas. La tabla de hechos (fact table) almacena eventos de negocio medibles: ventas, cantidades, montos, costos. Cada fila es una transacción o un evento. Las tablas de dimensión (dimension tables) guardan atributos descriptivos que responden preguntas de contexto: ¿quién compró? (cliente), ¿qué producto? (producto), ¿cuándo? (fecha), ¿dónde? (región, tienda).',
+            'El CFO pide: "ventas por región y trimestre." El número (cuánto se vendió) vive en la tabla de hechos; la región y el trimestre viven en dimensiones. Separar "qué pasó" de "en qué contexto" es el truco del reporting dimensional — y lo que verás en data warehouses Oracle (incluido el esquema SH de demos).',
         },
         {
           type: 'comparison',
@@ -26,7 +28,7 @@ export const level3: ConceptLevel = {
               {
                 aspect: 'Contenido',
                 optionA: 'Transacciones: ventas, pedidos, movimientos de inventario',
-                optionB: 'Descriptores: nombre cliente, categoría producto, mes, región',
+                optionB: 'Descriptores: nombre cliente, categoría, mes, región',
               },
               {
                 aspect: 'Columnas típicas',
@@ -36,10 +38,10 @@ export const level3: ConceptLevel = {
               {
                 aspect: 'Volumen',
                 optionA: 'Muy grande — crece con cada transacción',
-                optionB: 'Relativamente pequeña — miles o millones, no miles de millones',
+                optionB: 'Relativamente pequeña frente a los hechos',
               },
               {
-                aspect: 'Ejemplo ERP',
+                aspect: 'Ejemplo ERP / DW',
                 optionA: 'fact_ventas: monto, cantidad, costo',
                 optionB: 'dim_cliente: nombre, segmento, ciudad',
               },
@@ -50,7 +52,7 @@ export const level3: ConceptLevel = {
           type: 'code',
           code: {
             title: 'Ejemplo simplificado',
-            sql: `-- Tabla de HECHOS: cada fila = una línea de venta
+            sql: `-- HECHOS: cada fila = una línea de venta
 CREATE TABLE fact_ventas (
   venta_id      NUMBER PRIMARY KEY,
   cliente_key   NUMBER,    -- FK → dim_cliente
@@ -61,7 +63,7 @@ CREATE TABLE fact_ventas (
   costo         NUMBER(12,2)
 );
 
--- Tabla de DIMENSIÓN: describe al cliente
+-- DIMENSIÓN: describe al cliente
 CREATE TABLE dim_cliente (
   cliente_key   NUMBER PRIMARY KEY,
   cliente_id    NUMBER,
@@ -77,26 +79,33 @@ CREATE TABLE dim_cliente (
             'Las medidas en hechos son sumables: SUM(monto), SUM(cantidad), AVG(margen).',
             'Las dimensiones se usan para filtrar y agrupar: GROUP BY segmento, mes.',
             'La clave en dimensiones suele ser surrogate (cliente_key) distinta del ID operacional (cliente_id) para manejar historial.',
+            'Un mismo hecho puede unirse a varias dimensiones a la vez (cliente + producto + tiempo + tienda).',
           ],
         },
         {
           type: 'application',
           application: {
-            title: 'Reporte "ventas por región y trimestre"',
-            text: 'Consultas fact_ventas (SUM de monto) y hace JOIN a dim_cliente (región) y dim_tiempo (trimestre). Los hechos aportan el número; las dimensiones aportan el contexto para cortar el reporte.',
+            title: 'Cómo se lo dices a un cliente',
+            text: '"El hecho es el número de la venta. Las dimensiones son las etiquetas con las que usted corta el reporte: por cliente, por producto, por mes. Si mezclamos todo en una sola tabla operativa, cada dashboard tarda y se vuelve frágil."',
           },
+        },
+        {
+          type: 'note',
+          content:
+            'En GenO Comercial este vocabulario abre conversaciones de Analytics / BI: no necesitas diseñar el DW, sí distinguir hecho de dimensión en una demo SH.',
         },
       ],
     },
     {
       id: 'estrella-vs-copo',
       title: 'Esquema estrella vs copo de nieve',
-      summary: 'Estrella conecta hechos directo a dimensiones planas; copo de nieve normaliza dimensiones en subtablas.',
+      summary:
+        'Estrella: hechos en el centro y dimensiones planas. Copo: dimensiones normalizadas en subtablas.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'El esquema estrella (star schema) coloca la tabla de hechos en el centro conectada directamente a dimensiones desnormalizadas — cada dimensión es una sola tabla con todos sus atributos. El esquema copo de nieve (snowflake schema) normaliza las dimensiones: si producto pertenece a categoría y categoría a familia, creas subtablas separadas unidas por FKs, formando una estructura ramificada.',
+            'Cuando el equipo de BI propone "iremos a un star schema", están eligiendo velocidad y simplicidad de consulta: la tabla de hechos en el centro, dimensiones desnormalizadas alrededor. El copo de nieve (snowflake) normaliza esas dimensiones (producto → categoría → familia) a costa de más JOINs. En demos y la mayoría de warehouses ERP, la estrella gana por claridad comercial.',
         },
         { type: 'diagram', diagram: 'star-schema' },
         { type: 'diagram', diagram: 'snowflake-schema' },
@@ -114,7 +123,7 @@ CREATE TABLE dim_cliente (
               },
               {
                 aspect: 'Redundancia',
-                optionA: 'Mayor — categoría repetida en cada fila de dim_producto',
+                optionA: 'Mayor — categoría repetida en dim_producto',
                 optionB: 'Menor — categoría en tabla aparte',
               },
               {
@@ -124,13 +133,13 @@ CREATE TABLE dim_cliente (
               },
               {
                 aspect: 'Mantenimiento',
-                optionA: 'Actualizar categoría implica tocar muchas filas',
+                optionA: 'Actualizar categoría toca muchas filas',
                 optionB: 'Actualizar categoría en un solo lugar',
               },
               {
                 aspect: 'Uso típico',
                 optionA: 'Data warehouses, BI, reportes analíticos',
-                optionB: 'Cuando dimensiones son muy jerárquicas y cambian poco',
+                optionB: 'Jerarquías profundas que cambian poco',
               },
             ],
           },
@@ -139,7 +148,7 @@ CREATE TABLE dim_cliente (
           type: 'code',
           code: {
             title: 'Consulta sobre esquema estrella',
-            sql: `-- Ventas por categoría de producto (estrella: 2 JOINs)
+            sql: `-- Ventas por categoría (estrella: pocos JOINs)
 SELECT dp.categoria,
        SUM(fv.monto) AS total_ventas
 FROM   fact_ventas fv
@@ -152,8 +161,8 @@ GROUP BY dp.categoria;`,
         {
           type: 'application',
           application: {
-            title: 'Elegir diseño en un ERP',
-            text: 'La mayoría de ERPs analíticos usan estrella porque los reportes son más simples y rápidos. Copo de nieve aparece cuando el catálogo de productos tiene jerarquías profundas (familia → línea → categoría → SKU) y se quiere evitar redundancia.',
+            title: 'En una reunión comercial',
+            text: '"La mayoría de ERPs analíticos usan estrella porque el reporte gerencial queda con 3–4 JOINs, no con 12. Copo de nieve aparece cuando el catálogo tiene jerarquías muy profundas y el cliente prioriza mantener una sola definición de categoría."',
           },
         },
       ],
@@ -161,46 +170,70 @@ GROUP BY dp.categoria;`,
     {
       id: 'erp-modelo-dimensional',
       title: 'Por qué un ERP usa este modelo',
-      summary: 'Separar "qué pasó" de "quién/qué/cuándo" permite reportes analíticos rápidos sin recalcular todo el OLTP.',
+      summary:
+        'OLTP registra la venta ahora; el modelo dimensional responde "¿cuánto vendimos por región en Q1?" sin castigar el operativo.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Un ERP transaccional (OLTP) está optimizado para insertar pedidos, actualizar inventario y facturar en tiempo real — muchas tablas normalizadas, muchas FKs, operaciones pequeñas y frecuentes. Los reportes gerenciales necesitan lo contrario: leer millones de filas históricas, sumar, agrupar y filtrar por múltiples ejes. El modelo dimensional resuelve esa tensión separando claramente la transacción (hecho) de su contexto (dimensiones).',
+            'El ERP del día a día (OLTP) está optimizado para insertar pedidos y actualizar stock: muchas tablas normalizadas, operaciones pequeñas y frecuentes. El reporte gerencial necesita lo contrario: leer historia, sumar y cortar por varios ejes. El modelo dimensional resuelve esa tensión: se extraen datos del ERP (ETL), se cargan en hechos + dimensiones, y los dashboards dejan de pelearse con el sistema operativo.',
         },
         {
           type: 'list',
           items: [
             'OLTP responde: "registrar esta venta ahora" — pocas filas, alta concurrencia.',
             'OLAP/BI responde: "¿cuánto vendimos por región en Q1?" — millones de filas, agregaciones.',
-            'El data warehouse extrae datos del ERP (ETL), los transforma al modelo estrella y alimenta dashboards.',
+            'El data warehouse alimenta dashboards sin bloquear cajas ni facturación.',
             'Las dimensiones desnormalizadas evitan 10 JOINs en cada reporte gerencial.',
+            'Esquemas como SH en demos Oracle ilustran exactamente este patrón estrella.',
           ],
         },
         {
           type: 'paragraph',
           content:
-            'Piensa en la metáfora del recibo de supermercado: el hecho es cada línea del ticket (producto, cantidad, precio). Las dimensiones son las etiquetas que explican el contexto — fecha de compra, tienda, cliente fidelizado, categoría del producto. Sin esa separación, cada reporte tendría que reconstruir el contexto desde docenas de tablas operacionales.',
+            'Metáfora útil en cliente: el recibo del supermercado. Cada línea del ticket es un hecho (producto, cantidad, precio). Las dimensiones son las etiquetas de contexto — fecha, tienda, cliente fidelizado, categoría. Sin esa separación, cada informe tendría que reconstruir el contexto desde docenas de tablas operacionales.',
         },
         {
-          type: 'code',
-          code: {
-            title: 'Pregunta típica de examen',
-            sql: `-- ¿Cuál es la ventaja del esquema estrella en reporting?
--- Respuesta conceptual (no es SQL ejecutable):
---
--- 1. Consultas más simples (menos JOINs)
--- 2. Agregaciones predecibles sobre tabla de hechos
--- 3. Dimensiones reutilizables para múltiples reportes
--- 4. Separación clara entre medidas y atributos descriptivos`,
+          type: 'comparison',
+          comparison: {
+            title: 'Operativo vs analítico',
+            headerA: 'ERP operativo (OLTP / CO)',
+            headerB: 'Reporting dimensional (OLAP / SH)',
+            rows: [
+              {
+                aspect: 'Pregunta típica',
+                optionA: '¿Puedo facturar este pedido ahora?',
+                optionB: '¿Cómo van las ventas por región y trimestre?',
+              },
+              {
+                aspect: 'Diseño',
+                optionA: 'Normalizado, muchas FKs',
+                optionB: 'Estrella / desnormalizado a propósito',
+              },
+              {
+                aspect: 'Prioridad',
+                optionA: 'Integridad y concurrencia',
+                optionB: 'Velocidad de agregación y claridad de ejes',
+              },
+              {
+                aspect: 'Riesgo si se mezclan',
+                optionA: 'Reportes pesados frenan el operativo',
+                optionB: 'Sin DW, el cliente improvisa Excels paralelos',
+              },
+            ],
           },
         },
         {
           type: 'application',
           application: {
-            title: 'Cierre de mes en ERP',
-            text: 'Finanzas necesita ventas netas por sucursal, categoría y vendedor. En OLTP recorrerías pedidos → detalle → producto → categoría → sucursal → empleado. En el esquema estrella, un SELECT sobre fact_ventas con 3-4 JOINs a dimensiones responde en segundos sobre datos históricos.',
+            title: 'Por qué un vendedor Oracle lo necesita',
+            text: 'En cierre de mes, Finanzas pide ventas netas por sucursal, categoría y vendedor. En OLTP recorrerías pedidos → detalle → producto → categoría → sucursal → empleado. En estrella, un SELECT sobre fact_ventas con 3–4 JOINs a dimensiones responde sobre historia. Esa historia es la justificación comercial de Analytics / Autonomous Data Warehouse junto al ERP.',
           },
+        },
+        {
+          type: 'note',
+          content:
+            'Frase útil con técnicos: "no vamos a reportar directo sobre el OLTP; vamos a un modelo dimensional." Demuestra que entiendes el porqué del DW sin diseñar el ETL.',
         },
       ],
     },

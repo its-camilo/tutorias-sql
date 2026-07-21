@@ -39,6 +39,8 @@ export interface Exercise {
   enunciado: string
   part: ExercisePart
   context: string
+  /** Pregunta comercial: explicar el resultado a un cliente en lenguaje de negocio */
+  clientAsk?: string
   steps: SqlStep[]
   diagram: ExerciseDiagramVariant
   diagramCaption: string

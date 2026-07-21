@@ -11,8 +11,9 @@ export const exerciseSchemas: ExerciseSchema[] = [
     shortName: 'CO',
     badge: 'ERP de ventas',
     description:
-      'Simula un ERP de ventas completo con clientes, productos, pedidos, tiendas, envíos e inventario. Cubre del Nivel 1 al Nivel 4: fundamentos, JOINs, subconsultas y PL/SQL.',
-    purpose: 'Columna vertebral de la tutoría — practica SQL en contexto real de negocio.',
+      'Simula un ERP de pedidos: clientes, productos, inventario y ventas. Ejercicios pensados para el perfil Comercial GenO — entender y explicar, no memorizar SQL avanzado.',
+    purpose:
+      'Practica consultas útiles en prospección, seguimiento de cuentas e inventario, y cierra cada una explicándola en lenguaje de cliente.',
     tables: coTables,
     exercises: coExercises,
   },
@@ -22,8 +23,9 @@ export const exerciseSchemas: ExerciseSchema[] = [
     shortName: 'SH',
     badge: 'Data warehouse',
     description:
-      'Esquema dimensional diseñado para reportes analíticos. Contiene la tabla de hechos SALES conectada a dimensiones de tiempo, clientes, productos, canales y promociones.',
-    purpose: 'Bloque de modelado dimensional — Nivel 3 (fact vs dimension, esquema estrella).',
+      'Esquema dimensional para reportes: hechos de venta conectados a producto, tiempo y canal. Ideal para hablar de reporting con un cliente sin tecnicismos excesivos.',
+    purpose:
+      'Practica el vocabulario de hechos vs dimensiones — clave en conversaciones comerciales sobre analítica.',
     tables: shTables,
     exercises: shExercises,
   },

@@ -39,6 +39,13 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
           <p className={styles.contextText}>{exercise.context}</p>
         </section>
 
+        {exercise.clientAsk && (
+          <aside className={styles.clientAsk}>
+            <span className={styles.clientAskLabel}>Explícaselo a un cliente</span>
+            <p className={styles.clientAskText}>{exercise.clientAsk}</p>
+          </aside>
+        )}
+
         <section>
           <h4 className={styles.sectionLabel}>Construye la consulta paso a paso</h4>
           <SqlCarousel steps={exercise.steps} />

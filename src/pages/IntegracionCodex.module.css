@@ -64,6 +64,10 @@
   color: var(--color-accent);
 }
 
+.introNote {
+  margin-top: 1rem;
+}
+
 .platformBar {
   padding: 0 1.75rem 1.25rem;
   border-bottom: 1px solid var(--color-border);

@@ -111,6 +111,15 @@ export default function IntegracionCodex() {
           , levantas Oracle en Docker y usas el <strong>MCP de SQLcl</strong> para que la IA
           ejecute los ejercicios de la tutoría.
         </p>
+        <div className={`${styles.note} ${styles.introNote}`}>
+          <span className={styles.noteLabel}>Plus de diferenciación (GenO Comercial)</span>
+          <p>
+            GenO insiste en que la IA es para todos los perfiles, no solo técnicos. Dominar este
+            flujo (IA + datos Oracle) es un <strong>plus</strong> para un pitch o assessment
+            center — no una habilidad exigida en la selección. Úsalo para demostrar soltura, no
+            para memorizar MCP.
+          </p>
+        </div>
         <div className={styles.flow} aria-label="Flujo de integración local">
           <span className={styles.flowItem}>Codex / Cursor / OpenCode</span>
           <span className={styles.flowArrow} aria-hidden="true">→</span>
@@ -651,9 +660,9 @@ Explícame el resultado.`}
             </p>
           </div>
           <div className={styles.promptCard}>
-            <p className={styles.promptTitle}>4. PL/SQL (ejercicio cursor)</p>
+            <p className={styles.promptTitle}>4. Explicar PL/SQL (lectura)</p>
             <p className={styles.promptText}>
-              {`Usa SQLcl MCP. Ejecuta el bloque PL/SQL del ejercicio de cursor con SET SERVEROUTPUT ON y muéstrame la salida.`}
+              {`Usa SQLcl MCP. Muestra el bloque PL/SQL del ejercicio de reconocimiento (CUSTOMER_ID = 5) y explícame en lenguaje comercial qué hace, sin reescribirlo.`}
             </p>
           </div>
           <div className={styles.note}>

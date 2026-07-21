@@ -5,40 +5,40 @@ export const level0: ConceptLevel = {
   number: 0,
   title: 'Fundamentos antes del SQL',
   subtitle:
-    'Vocabulario teórico que abre los exámenes Oracle: entidades, relaciones, modelos y normalización — antes de escribir la primera consulta.',
+    'Vocabulario para entender cómo Oracle organiza el negocio — sin ser especialista técnico.',
   concepts: [
     {
       id: 'que-es-base-datos',
       title: '¿Qué es una base de datos?',
       summary:
-        'Colección organizada de datos relacionados, gestionada por un DBMS que permite guardar, consultar y modificar información de forma segura.',
+        'El lugar donde el negocio guarda clientes, pedidos e inventario de forma segura, compartida y consistente.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Una base de datos es un conjunto estructurado de información que representa hechos del negocio: clientes, productos, pedidos, inventario. No es solo un archivo Excel grande: está diseñada para que muchas personas y sistemas accedan al mismo tiempo, con reglas que garantizan consistencia y seguridad.',
+            'Un cliente pregunta: "¿Dónde vive mi información de ventas?" La respuesta no es un Excel en el escritorio de alguien. Una base de datos es la colección organizada de datos del negocio — clientes, productos, pedidos — gestionada por un DBMS (en Oracle, Oracle Database) que permite consultar, modificar y proteger esa información al mismo tiempo para muchas personas y sistemas.',
         },
         {
           type: 'list',
           items: [
-            'DBMS (Database Management System): el software que administra la base — en Oracle, Oracle Database.',
-            'Persistencia: los datos sobreviven aunque apagues el servidor.',
+            'DBMS: el software que administra la base (Oracle Database).',
+            'Persistencia: los datos siguen ahí aunque apagues el servidor.',
             'Integridad: reglas que evitan datos inválidos (claves, tipos, restricciones).',
-            'Concurrencia: varios usuarios pueden leer y escribir sin corromper la información.',
+            'Concurrencia: varios usuarios leen y escriben sin corromper la información.',
             'Seguridad: permisos por usuario o rol sobre tablas y operaciones.',
           ],
         },
         {
           type: 'application',
           application: {
-            title: 'Por qué un ERP necesita una base de datos',
-            text: 'Un ERP centraliza ventas, inventario y facturación en un solo lugar. Sin base de datos, cada área tendría su propia planilla y los totales no coincidirían. El DBMS garantiza que cuando un vendedor registra un pedido, el stock y la cuenta del cliente se actualicen de forma coherente.',
+            title: 'Cómo se lo dices a un cliente',
+            text: '"Su ERP no es un archivo suelto: es una base de datos Oracle donde ventas, inventario y facturación comparten la misma verdad. Cuando un vendedor registra un pedido, el stock y la cuenta del cliente se actualizan de forma coherente — eso es lo que compra con Oracle."',
           },
         },
         {
           type: 'note',
           content:
-            'En exámenes Oracle suelen preguntar verdadero/falso sobre si una base de datos es "solo un archivo" o si requiere un sistema gestor. La respuesta correcta siempre implica organización + gestión + reglas.',
+            'En GenO Comercial no te piden instalar Oracle: te piden explicar por qué un ERP necesita un DBMS y no un archivo compartido.',
         },
       ],
     },
@@ -46,20 +46,20 @@ export const level0: ConceptLevel = {
       id: 'que-es-tabla',
       title: '¿Qué es una tabla?',
       summary:
-        'Estructura que organiza datos en filas (registros) y columnas (atributos): la unidad básica donde vive la información.',
+        'Filas y columnas: la forma en que el negocio organiza cada tipo de información (clientes, pedidos, productos).',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Una tabla es como una hoja de cálculo con reglas estrictas. Cada fila representa un registro individual — un cliente, un producto, un pedido. Cada columna representa un atributo — nombre, precio, fecha. En SQL, casi todo lo que consultas proviene de tablas.',
+            'En una demo, el cliente ve "lista de clientes" o "catálogo de productos". Por detrás, eso es una tabla: filas (cada cliente o producto) y columnas (nombre, precio, fecha). Es como una hoja de cálculo con reglas estrictas — y en SQL casi todo lo que consultas proviene de tablas.',
         },
         {
           type: 'list',
           items: [
-            'Fila (registro, tupla): una instancia concreta del concepto — ej. el cliente "Ana García".',
-            'Columna (campo, atributo): una característica — ej. EMAIL, CIUDAD, FECHA_ALTA.',
-            'Tipo de dato: cada columna define qué valores admite — NUMBER, VARCHAR2, DATE.',
-            'Tabla vacía vs tabla con datos: la estructura (columnas) existe aunque no haya filas.',
+            'Fila (registro): una instancia concreta — el cliente "Ana García".',
+            'Columna (atributo): una característica — EMAIL, CIUDAD, FECHA_ALTA.',
+            'Tipo de dato: qué valores admite la columna — NUMBER, VARCHAR2, DATE.',
+            'La estructura (columnas) existe aunque la tabla esté vacía.',
           ],
         },
         {
@@ -72,14 +72,14 @@ export const level0: ConceptLevel = {
 | 1           | Ana García   | ana@mail.com       | Bogotá  |
 | 2           | Luis Pérez   | luis@mail.com      | Medellín|
 | 3           | María López  | maria@mail.com     | Cali    |`,
-            caption: 'En Oracle las tablas reales no se ven así en pantalla, pero conceptualmente funciona igual.',
+            caption: 'En Oracle las tablas no se ven así en pantalla, pero conceptualmente funciona igual.',
           },
         },
         {
           type: 'application',
           application: {
-            title: 'Tabla en un ERP de ventas',
-            text: 'CO.ORDERS guarda pedidos: cada fila es un pedido con ORDER_ID, fecha, cliente y estado. CO.ORDER_ITEMS guarda las líneas de cada pedido. Separar en tablas evita repetir datos del cliente en cada línea.',
+            title: 'Por qué un vendedor Oracle lo necesita',
+            text: 'Cuando hablas del esquema CO, CO.ORDERS es "la tabla de pedidos" y CO.ORDER_ITEMS "las líneas de cada pedido". Separar en tablas evita repetir datos del cliente en cada línea — y te permite explicar por qué el reporte cruza varias tablas.',
           },
         },
       ],
@@ -88,20 +88,20 @@ export const level0: ConceptLevel = {
       id: 'que-es-esquema',
       title: '¿Qué es un esquema?',
       summary:
-        'Conjunto de tablas, relaciones y reglas que definen la estructura completa de una base de datos — el plano de cómo se organiza todo.',
+        'El "departamento" lógico dentro de Oracle: un conjunto de tablas del mismo contexto de negocio (CO, SH).',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Un esquema es el "plano arquitectónico" de la base de datos. Agrupa tablas relacionadas, sus claves, restricciones y permisos bajo un nombre lógico. En Oracle, un esquema suele corresponder al usuario propietario: el esquema CO contiene las tablas del ERP de pedidos; el esquema SH contiene el data warehouse de ventas históricas.',
+            'El cliente tiene un ERP operativo y también reportes históricos. En Oracle eso suele vivir en esquemas distintos: el esquema es el plano que agrupa tablas, claves y permisos bajo un nombre. CO concentra pedidos del día a día; SH concentra el data warehouse de ventas históricas — misma instancia, contextos separados.',
         },
         {
           type: 'list',
           items: [
-            'Define qué tablas existen y cómo se relacionan entre sí.',
-            'Establece reglas de integridad: claves primarias, foráneas, valores permitidos.',
-            'Separa contextos de negocio: ventas operativas (CO) vs analítica histórica (SH).',
-            'Permite que distintos equipos trabajen sobre estructuras independientes pero en la misma instancia.',
+            'Define qué tablas existen y cómo se relacionan.',
+            'Establece reglas de integridad: PK, FK, valores permitidos.',
+            'Separa contextos: ventas operativas (CO) vs analítica histórica (SH).',
+            'Permite que equipos distintos trabajen sin mezclar objetos.',
           ],
         },
         {
@@ -122,17 +122,24 @@ export const level0: ConceptLevel = {
                 optionB: 'El edificio completo con todos sus departamentos',
               },
               {
-                aspect: 'En FreeSQL',
+                aspect: 'En FreeSQL / demos',
                 optionA: 'Customer Orders (CO), Sales History (SH)',
-                optionB: 'La conexión entera a Oracle FreeSQL',
+                optionB: 'La conexión entera a Oracle',
               },
             ],
           },
         },
         {
+          type: 'application',
+          application: {
+            title: 'En una reunión comercial',
+            text: '"CO es el esquema operativo de pedidos; SH es el de reporting histórico. No son bases distintas en el sentido de otro servidor: son namespaces de negocio dentro de la misma Oracle. Así el equipo técnico sabe de qué módulo hablamos."',
+          },
+        },
+        {
           type: 'note',
           content:
-            'En exámenes Oracle, confundir "esquema" con "tabla" es un error común. El esquema contiene muchas tablas; una tabla es solo una pieza del esquema.',
+            'Confundir esquema con tabla es un error frecuente en conversaciones con clientes: el esquema contiene muchas tablas.',
         },
       ],
     },
@@ -140,20 +147,20 @@ export const level0: ConceptLevel = {
       id: 'que-es-atributo',
       title: '¿Qué es un atributo?',
       summary:
-        'Cada columna representa una característica del dato — nombre, precio, fecha — y define qué se puede saber de cada registro.',
+        'Cada característica que el negocio quiere rastrear de un cliente, producto o pedido — en la tabla, una columna.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Un atributo es una propiedad que describe a una entidad. En la tabla PRODUCTOS, los atributos pueden ser PRODUCT_NAME, UNIT_PRICE, CATEGORY. Cada atributo tiene un tipo de dato y reglas: el precio es numérico, el nombre es texto, la fecha de alta es DATE.',
+            'El cliente dice: "Necesito saber precio, categoría y proveedor de cada producto." Esas características son atributos. En la tabla se convierten en columnas con tipo y reglas: el precio es numérico, el nombre es texto, la fecha de alta es DATE. Lo que el negocio decide rastrear define qué reportes podrá pedir después.',
         },
         {
           type: 'list',
           items: [
-            'Atributo simple: un solo valor por celda — ej. PRECIO = 1500.',
-            'Atributo compuesto (conceptual): se descompone en partes — ej. DIRECCIÓN → calle, ciudad, código postal.',
-            'Atributo multivaluado (conceptual): varios valores — ej. teléfonos de un cliente; en tablas relacionales se normaliza en otra tabla.',
-            'Atributo derivado: se calcula a partir de otros — ej. TOTAL = PRECIO × CANTIDAD.',
+            'Atributo simple: un valor por celda — PRECIO = 1500.',
+            'Atributo compuesto (conceptual): se parte — DIRECCIÓN → calle, ciudad, CP.',
+            'Atributo multivaluado (conceptual): varios valores — teléfonos; en relacional se normaliza en otra tabla.',
+            'Atributo derivado: se calcula — TOTAL = PRECIO × CANTIDAD.',
           ],
         },
         {
@@ -161,18 +168,18 @@ export const level0: ConceptLevel = {
           code: {
             title: 'Atributos en CO.PRODUCTS',
             sql: `-- Cada columna es un atributo del producto
-PRODUCT_ID       → identificador
-PRODUCT_NAME     → nombre comercial
-PRODUCT_DESCRIPTION → detalle
-CATEGORY_ID      → clasificación
-UNIT_PRICE       → precio de venta`,
+PRODUCT_ID            → identificador
+PRODUCT_NAME          → nombre comercial
+PRODUCT_DESCRIPTION   → detalle
+CATEGORY_ID           → clasificación
+UNIT_PRICE            → precio de venta`,
           },
         },
         {
           type: 'application',
           application: {
-            title: 'Explicárselo a un cliente',
-            text: '"Cada columna de su catálogo es un atributo: usted decide qué características quiere rastrear — precio, categoría, proveedor. Eso define qué reportes podrá generar después."',
+            title: 'Cómo se lo dices a un cliente',
+            text: '"Cada columna de su catálogo es un atributo: usted decide qué características quiere rastrear. Eso define qué filtros y reportes podrá generar. Si no guardamos el segmento del cliente hoy, no podremos segmentar campañas mañana."',
           },
         },
       ],
@@ -181,20 +188,20 @@ UNIT_PRICE       → precio de venta`,
       id: 'que-es-entidad',
       title: '¿Qué es una entidad?',
       summary:
-        'Objeto o concepto del mundo real que se representa como tabla — cliente, producto, pedido.',
+        'Un concepto del negocio que hay que registrar y distinguir: Cliente, Producto, Pedido — luego se vuelve tabla.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Una entidad es algo del negocio que necesitas registrar y distinguir de otros. "Cliente" es una entidad porque cada cliente es único y tiene propiedades propias. "Pedido" es otra entidad distinta. En el modelo lógico, cada entidad fuerte se convierte en una tabla.',
+            'En el discovery con el cliente preguntas: "¿Qué cosas del negocio necesitamos registrar?" Cada respuesta — Cliente, Pedido, Tienda — es una entidad: algo que se distingue de otros y tiene propiedades propias. En el modelo lógico, cada entidad fuerte se convierte en una tabla.',
         },
         {
           type: 'list',
           items: [
             'Entidad fuerte: existe por sí sola — CLIENTE, PRODUCTO, TIENDA.',
             'Entidad débil (conceptual): depende de otra — LÍNEA_DE_PEDIDO depende de PEDIDO.',
-            'Instancia de entidad: un registro concreto — el cliente con ID 5, no el concepto abstracto.',
-            'Conjunto de entidades: todos los clientes del sistema = todas las filas de CO.CUSTOMERS.',
+            'Instancia: un registro concreto — el cliente con ID 5.',
+            'Conjunto: todos los clientes = todas las filas de CO.CUSTOMERS.',
           ],
         },
         {
@@ -207,7 +214,7 @@ UNIT_PRICE       → precio de venta`,
               {
                 aspect: 'Cliente',
                 optionA: 'Entidad "Cliente" en el diagrama ER',
-                optionB: 'Tabla CO.CUSTOMERS con filas de clientes reales',
+                optionB: 'Tabla CO.CUSTOMERS con filas reales',
               },
               {
                 aspect: 'Ana García',
@@ -223,9 +230,11 @@ UNIT_PRICE       → precio de venta`,
           },
         },
         {
-          type: 'note',
-          content:
-            'Pregunta típica de examen: "¿Una entidad es lo mismo que una fila?" No exactamente — la entidad es el concepto (Cliente); la fila es una instancia concreta (Ana García).',
+          type: 'application',
+          application: {
+            title: 'En una reunión con el equipo técnico',
+            text: 'Puedes decir: "La entidad es el concepto de negocio; la tabla es cómo Oracle lo guarda; la fila es un caso concreto." Así alineas al analista de negocio con el DBA sin escribir DDL.',
+          },
         },
       ],
     },
@@ -233,19 +242,19 @@ UNIT_PRICE       → precio de venta`,
       id: 'clave-primaria',
       title: 'Clave primaria (PK)',
       summary:
-        'Identificador único de cada fila en una tabla: no se repite, no queda vacío y distingue un registro de cualquier otro.',
+        'El "DNI" de cada fila: identifica unívocamente un cliente, un pedido o un producto.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'La clave primaria (Primary Key, PK) garantiza que cada fila sea identificable de forma unívoca. En CO.CUSTOMERS, CUSTOMER_ID es la PK: no puede haber dos clientes con el mismo ID, ni un cliente sin ID. Oracle crea un índice automático sobre la PK para búsquedas rápidas.',
+            'Sin un identificador único, el sistema no sabe qué pedido actualizar o facturar. La clave primaria (PK) garantiza que cada fila sea identificable: en CO.CUSTOMERS, CUSTOMER_ID no se repite y no puede quedar vacío. Es el ancla de facturas, envíos y reportes.',
         },
         {
           type: 'list',
           items: [
             'Unicidad: dos filas nunca comparten el mismo valor de PK.',
-            'No nulidad: la PK no puede ser NULL — siempre debe tener valor.',
-            'Inmutabilidad recomendada: conviene que no cambie (por eso se usan IDs numéricos, no nombres).',
+            'No nulidad: la PK no puede ser NULL.',
+            'Inmutabilidad recomendada: conviene IDs numéricos, no nombres.',
             'Una sola PK por tabla (puede ser compuesta: varias columnas juntas).',
           ],
         },
@@ -261,9 +270,9 @@ UNIT_PRICE       → precio de venta`,
 
 -- PK compuesta: la combinación es única
 CREATE TABLE CO.ORDER_ITEMS (
-  ORDER_ID    NUMBER,
+  ORDER_ID     NUMBER,
   LINE_ITEM_ID NUMBER,
-  QUANTITY    NUMBER,
+  QUANTITY     NUMBER,
   PRIMARY KEY (ORDER_ID, LINE_ITEM_ID)
 );`,
           },
@@ -271,8 +280,8 @@ CREATE TABLE CO.ORDER_ITEMS (
         {
           type: 'application',
           application: {
-            title: 'Por qué importa en un ERP',
-            text: 'Sin PK, no podrías referenciar un pedido específico desde la factura ni desde el envío. La PK es el "DNI" de cada registro — sin ella, el sistema no sabe cuál fila actualizar.',
+            title: 'Por qué un vendedor Oracle lo necesita',
+            text: '"La PK es el DNI de cada registro. Sin ella no puedes referenciar un pedido desde la factura ni desde el envío. Cuando el cliente pide trazabilidad extremo a extremo, estás hablando de claves primarias bien definidas."',
           },
         },
       ],
@@ -281,20 +290,20 @@ CREATE TABLE CO.ORDER_ITEMS (
       id: 'clave-foranea',
       title: 'Clave foránea (FK)',
       summary:
-        'Columna que enlaza una tabla con otra — la base de las relaciones entre entidades.',
+        'El enlace entre tablas: el pedido apunta al cliente sin copiar nombre ni email en cada fila.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Una clave foránea (Foreign Key, FK) es una columna (o conjunto) que referencia la PK de otra tabla. En CO.ORDERS, CUSTOMER_ID es FK que apunta a CO.CUSTOMERS(CUSTOMER_ID). Esto permite vincular un pedido con su cliente sin duplicar nombre ni email en cada pedido.',
+            'El negocio necesita "ver el pedido con su cliente". La clave foránea (FK) es la columna que referencia la PK de otra tabla: en CO.ORDERS, CUSTOMER_ID apunta a CO.CUSTOMERS. Así vinculas sin duplicar datos — y Oracle impide pedidos con un cliente que no existe.',
         },
         {
           type: 'list',
           items: [
-            'Integridad referencial: Oracle impide insertar un FK que no exista en la tabla padre.',
-            'Tabla padre (referenciada): donde está la PK — CO.CUSTOMERS.',
-            'Tabla hija (referenciante): donde está la FK — CO.ORDERS.',
-            'ON DELETE CASCADE (opcional): al borrar el padre, se borran hijos automáticamente.',
+            'Integridad referencial: no insertas un FK que no exista en el padre.',
+            'Tabla padre: donde está la PK — CO.CUSTOMERS.',
+            'Tabla hija: donde está la FK — CO.ORDERS.',
+            'ON DELETE CASCADE (opcional): al borrar el padre, se borran los hijos.',
           ],
         },
         {
@@ -308,16 +317,14 @@ CREATE TABLE CO.ORDER_ITEMS (
   CONSTRAINT fk_orders_customer
     FOREIGN KEY (CUSTOMER_ID)
     REFERENCES CO.CUSTOMERS (CUSTOMER_ID)
-);
-
--- CUSTOMER_ID en ORDERS debe existir en CUSTOMERS`,
+);`,
           },
         },
         {
           type: 'application',
           application: {
-            title: 'JOINs nacen de las FK',
-            text: 'Cuando en SQL escribes JOIN CO.ORDERS o ON CO.CUSTOMERS, estás usando las FK definidas en el esquema. El diseño relacional (FK) hace posible las consultas relacionales (JOIN).',
+            title: 'En una reunión comercial',
+            text: '"Los JOINs de los reportes nacen de las FK del diseño. Si el modelo de datos conecta cliente → pedido → producto, el dashboard puede cruzarlos. Si no hay FK claras, el reporte se vuelve frágil o manual."',
           },
         },
       ],
@@ -326,12 +333,12 @@ CREATE TABLE CO.ORDER_ITEMS (
       id: 'relaciones',
       title: 'Relaciones (1:1, 1:N, N:M)',
       summary:
-        'Cómo se conectan las entidades entre sí — un cliente puede tener muchos pedidos, pero un pedido pertenece a un solo cliente.',
+        'Cuántos de A se conectan con cuántos de B: un cliente muchos pedidos; un pedido un cliente.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Las cardinalidades describen cuántas instancias de una entidad se relacionan con cuántas de otra. Son la base del diseño relacional y aparecen constantemente en preguntas de modelo conceptual y diagramas ER.',
+            'En el taller de requisitos el cliente dice: "Un cliente tiene muchos pedidos, pero un pedido es de un solo cliente." Eso es cardinalidad — y define cómo se diseñan las tablas y las FK. Malentenderla genera pantallas y reportes incorrectos.',
         },
         {
           type: 'comparison',
@@ -343,17 +350,17 @@ CREATE TABLE CO.ORDER_ITEMS (
               {
                 aspect: 'Uno a uno (1:1)',
                 optionA: 'Cada A se asocia con exactamente un B y viceversa',
-                optionB: 'EMPLEADO ↔ CREDENCIAL_ACCESO (un empleado, una credencial)',
+                optionB: 'EMPLEADO ↔ CREDENCIAL_ACCESO',
               },
               {
                 aspect: 'Uno a muchos (1:N)',
                 optionA: 'Un A puede tener muchos B; cada B pertenece a un solo A',
-                optionB: 'CLIENTE → PEDIDOS (un cliente, muchos pedidos)',
+                optionB: 'CLIENTE → PEDIDOS',
               },
               {
                 aspect: 'Muchos a muchos (N:M)',
                 optionA: 'Muchos A se relacionan con muchos B',
-                optionB: 'PRODUCTO ↔ PROMOCIÓN (se resuelve con tabla intermedia)',
+                optionB: 'PRODUCTO ↔ PROMOCIÓN (tabla intermedia)',
               },
             ],
           },
@@ -361,17 +368,16 @@ CREATE TABLE CO.ORDER_ITEMS (
         {
           type: 'list',
           items: [
-            '1:N es la más común en ERP: se implementa con FK en la tabla "muchos" (PEDIDOS.CUSTOMER_ID).',
-            'N:M requiere tabla puente (intermedia) con FK a ambas entidades.',
-            '1:1 puede ser FK con restricción UNIQUE o tablas fusionadas si siempre van juntas.',
+            '1:N es la más común en ERP: FK en la tabla "muchos" (PEDIDOS.CUSTOMER_ID).',
+            'N:M requiere tabla puente con FK a ambas entidades.',
+            '1:1 puede ser FK con UNIQUE o tablas fusionadas si siempre van juntas.',
           ],
         },
         {
           type: 'code',
           code: {
             title: 'N:M con tabla intermedia',
-            sql: `-- Un producto puede estar en muchas promociones;
--- una promoción incluye muchos productos
+            sql: `-- Un producto en muchas promociones; una promoción con muchos productos
 CREATE TABLE PRODUCT_PROMO (
   PRODUCT_ID  NUMBER REFERENCES PRODUCTS(PRODUCT_ID),
   PROMO_ID    NUMBER REFERENCES PROMOTIONS(PROMO_ID),
@@ -382,7 +388,7 @@ CREATE TABLE PRODUCT_PROMO (
         {
           type: 'note',
           content:
-            'Pregunta de examen frecuente: "Un cliente tiene muchos pedidos" → relación 1:N. La FK va en la tabla PEDIDOS, no en CLIENTES.',
+            'Regla práctica para GenO: "un cliente tiene muchos pedidos" → 1:N; la FK va en PEDIDOS, no en CLIENTES.',
         },
       ],
     },
@@ -390,12 +396,12 @@ CREATE TABLE PRODUCT_PROMO (
       id: 'modelo-conceptual-vs-logico',
       title: 'Modelo conceptual vs. modelo lógico',
       summary:
-        'El conceptual describe entidades y relaciones del negocio; el lógico define tablas, tipos de datos y claves concretas.',
+        'Primero el lenguaje del negocio (entidades); después el lenguaje de Oracle (tablas, tipos, claves).',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'El modelado de datos avanza en capas. Primero entiendes el negocio (conceptual); luego lo traduces a estructuras implementables (lógico). Saltarse el conceptual lleva a tablas mal diseñadas; quedarse solo en el conceptual no permite crear la base de datos.',
+            'En una reunión con el cliente validas: "¿un pedido puede tener varios envíos?" Eso es modelo conceptual. Cuando el equipo técnico traduce eso a CREATE TABLE con NUMBER y VARCHAR2, es modelo lógico. Saltarse el conceptual lleva a tablas mal alineadas con el negocio; quedarse solo en el conceptual no permite implementar.',
         },
         {
           type: 'comparison',
@@ -416,7 +422,7 @@ CREATE TABLE PRODUCT_PROMO (
               },
               {
                 aspect: 'Audiencia',
-                optionA: 'Analistas, clientes, equipo de negocio',
+                optionA: 'Analistas, clientes, equipo comercial',
                 optionB: 'Desarrolladores, DBAs, implementación Oracle',
               },
               {
@@ -430,16 +436,16 @@ CREATE TABLE PRODUCT_PROMO (
         {
           type: 'list',
           items: [
-            'Conceptual: "Un cliente realiza pedidos" — sin decir si es NUMBER o VARCHAR2.',
-            'Lógico: CO.CUSTOMERS(CUSTOMER_ID NUMBER PK) y CO.ORDERS(CUSTOMER_ID NUMBER FK).',
-            'Físico (nivel extra): archivos, tablespaces, índices — lo maneja el DBA.',
+            'Conceptual: "Un cliente realiza pedidos" — sin decir NUMBER o VARCHAR2.',
+            'Lógico: CO.CUSTOMERS(CUSTOMER_ID NUMBER PK) y CO.ORDERS(CUSTOMER_ID FK).',
+            'Físico (nivel extra): tablespaces, índices — lo maneja el DBA.',
           ],
         },
         {
           type: 'application',
           application: {
             title: 'En una reunión con el cliente',
-            text: 'Primero validas el modelo conceptual ("¿un pedido puede tener varios envíos?"). Cuando todos están de acuerdo, pasas al lógico con nombres de tablas y columnas que Oracle entiende.',
+            text: 'Primero validas el conceptual ("¿un pedido puede tener varios envíos?"). Cuando el negocio está de acuerdo, el equipo técnico baja al lógico. Tu rol GenO es facilitar esa traducción, no escribir el DDL.',
           },
         },
       ],
@@ -448,20 +454,20 @@ CREATE TABLE PRODUCT_PROMO (
       id: 'diagrama-er',
       title: 'Diagrama entidad-relación (ER)',
       summary:
-        'Notación visual para representar entidades, atributos y relaciones antes de crear las tablas.',
+        'El dibujo que alinea negocio y técnica antes de crear tablas: entidades, atributos y cardinalidades.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'El diagrama ER es el lenguaje visual del modelado conceptual. Muestra entidades como rectángulos, atributos como óvalos o listas dentro del rectángulo, y relaciones como rombos o líneas con cardinalidad (1, N). Es la herramienta estándar para comunicar el diseño antes de escribir SQL.',
+            'Antes de invertir en desarrollo, el cliente necesita ver el mapa: quién se relaciona con quién. El diagrama ER es ese lenguaje visual — entidades, atributos y relaciones con cardinalidad. Te permite discutir el diseño en la pizarra sin abrir SQL Developer.',
         },
         {
           type: 'list',
           items: [
             'Rectángulo: entidad (CLIENTE, PRODUCTO, PEDIDO).',
             'Óvalo / lista: atributos (nombre, precio, fecha).',
-            'Rombo / línea etiquetada: relación ("realiza", "contiene").',
-            'Cardinalidad en los extremos: 1, N, M — quién se relaciona con cuántos.',
+            'Rombo / línea: relación ("realiza", "contiene").',
+            'Cardinalidad en los extremos: 1, N, M.',
             'PK subrayada o marcada con # en herramientas modernas.',
           ],
         },
@@ -485,13 +491,15 @@ CREATE TABLE PRODUCT_PROMO (
                                           │   quantity  │
                                           │   unit_price│
                                           └─────────────┘`,
-            caption: 'Este diagrama se traduce después a tablas CO.CUSTOMERS, CO.ORDERS y CO.ORDER_ITEMS.',
+            caption: 'Se traduce después a CO.CUSTOMERS, CO.ORDERS y CO.ORDER_ITEMS.',
           },
         },
         {
-          type: 'note',
-          content:
-            'En exámenes Oracle pueden mostrar un ER y pedir identificar cardinalidades, entidades débiles o qué atributo es PK. Practica leer la notación antes de la parte práctica de SQL.',
+          type: 'application',
+          application: {
+            title: 'Cómo se lo dices a un cliente',
+            text: '"Este diagrama es el contrato visual del modelo: si aquí falta una relación, el reporte que usted pide no saldrá limpio. Lo validamos juntos antes de que el equipo técnico cree las tablas."',
+          },
         },
       ],
     },
@@ -499,12 +507,12 @@ CREATE TABLE PRODUCT_PROMO (
       id: 'relacional-vs-nosql',
       title: 'Bases de datos relacionales vs. no relacionales',
       summary:
-        'Relacional organiza datos en tablas con relaciones fijas; NoSQL ofrece modelos flexibles para datos variables o no estructurados.',
+        'Oracle relacional para ERP y transacciones; NoSQL como complemento cuando la estructura es muy flexible o el volumen es extremo.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Las bases relacionales (como Oracle Database) son el estándar para ERPs y transacciones: estructura rígida, SQL, integridad referencial. Las no relacionales (NoSQL) priorizan flexibilidad y escala horizontal para casos como documentos JSON, grafos sociales o caché de alta velocidad.',
+            'El cliente pregunta: "¿Por qué no MongoDB para todo?" En un ERP de pedidos, facturas e inventario necesitas estructura fija, JOINs e integridad: ahí gana el modelo relacional (Oracle). NoSQL brilla en documentos variables, logs masivos o caché de alta velocidad — suele complementar, no reemplazar, el núcleo transaccional.',
         },
         {
           type: 'comparison',
@@ -515,18 +523,18 @@ CREATE TABLE PRODUCT_PROMO (
             rows: [
               {
                 aspect: 'Estructura',
-                optionA: 'Tablas con filas y columnas, esquema definido',
-                optionB: 'Documentos, clave-valor, columnas, grafos — según el motor',
+                optionA: 'Tablas con esquema definido',
+                optionB: 'Documentos, clave-valor, columnas, grafos',
               },
               {
                 aspect: 'Consultas',
-                optionA: 'SQL estándar con JOINs',
-                optionB: 'APIs propias, sin JOINs clásicos en muchos casos',
+                optionA: 'SQL con JOINs',
+                optionB: 'APIs propias; JOINs clásicos poco frecuentes',
               },
               {
                 aspect: 'Integridad',
                 optionA: 'PK, FK, transacciones ACID',
-                optionB: 'Eventual consistency en algunos sistemas distribuidos',
+                optionB: 'A menudo consistencia eventual en sistemas distribuidos',
               },
               {
                 aspect: 'Caso ideal',
@@ -539,8 +547,8 @@ CREATE TABLE PRODUCT_PROMO (
         {
           type: 'list',
           items: [
-            'Oracle es relacional — por eso el examen se centra en SQL y modelado relacional.',
-            'NoSQL no reemplaza al ERP: complementa casos donde la estructura cambia mucho o el volumen exige otro enfoque.',
+            'Oracle es relacional: por eso el stack GenO habla SQL y modelado.',
+            'NoSQL no sustituye al ERP: complementa casos de estructura cambiante o volumen extremo.',
             'Tipos NoSQL: documento (MongoDB), clave-valor (Redis), columna (Cassandra), grafo (Neo4j).',
           ],
         },
@@ -548,7 +556,7 @@ CREATE TABLE PRODUCT_PROMO (
           type: 'application',
           application: {
             title: 'Qué decirle al cliente',
-            text: '"Su ERP de pedidos, facturas e inventario vive en Oracle relacional porque necesita consistencia y reportes cruzados. Si después quiere analizar millones de eventos de click en web, ahí podría evaluar un complemento NoSQL."',
+            text: '"Su ERP de pedidos y facturas vive en Oracle relacional porque necesita consistencia y reportes cruzados. Si después quiere analizar millones de eventos de click en la web, ahí evaluamos un complemento NoSQL — sin tocar el núcleo financiero."',
           },
         },
       ],
@@ -557,12 +565,12 @@ CREATE TABLE PRODUCT_PROMO (
       id: 'normalizacion',
       title: 'Normalización (idea general)',
       summary:
-        'Proceso para evitar redundancia y anomalías: cada dato debería vivir en un solo lugar. 1FN, 2FN y 3FN son los pasos básicos.',
+        'Evitar que el mismo dato se repita en mil filas: cada hecho del negocio vive en un solo lugar (1FN, 2FN, 3FN).',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'La normalización organiza las tablas para que no se repita la misma información en varias filas. Sin normalizar, actualizar el nombre de un cliente en un pedido antiguo podría dejar datos inconsistentes. Las formas normales (FN) son reglas progresivas para lograrlo.',
+            'Sin normalizar, el nombre del cliente se repite en cada pedido: si Ana cambia de ciudad, hay que actualizar docenas de filas o quedas inconsistente. La normalización organiza tablas para que cada dato viva en un lugar. En reporting (SH) a veces se desnormaliza a propósito por velocidad — eso no contradice normalizar el ERP operativo (CO).',
         },
         {
           type: 'comparison',
@@ -574,17 +582,17 @@ CREATE TABLE PRODUCT_PROMO (
               {
                 aspect: '1FN',
                 optionA: 'Primera forma normal',
-                optionB: 'Cada celda tiene un solo valor atómico; no listas ni grupos repetidos en una columna',
+                optionB: 'Cada celda tiene un solo valor; no listas en una columna',
               },
               {
                 aspect: '2FN',
                 optionA: 'Segunda forma normal',
-                optionB: 'Cumple 1FN y todo atributo no-PK depende de toda la PK (no solo de parte de ella)',
+                optionB: 'Cumple 1FN y todo atributo no-PK depende de toda la PK',
               },
               {
                 aspect: '3FN',
                 optionA: 'Tercera forma normal',
-                optionB: 'Cumple 2FN y ningún atributo no-PK depende de otro atributo no-PK (sin dependencias transitivas)',
+                optionB: 'Cumple 2FN y sin dependencias entre atributos no-PK',
               },
             ],
           },
@@ -600,23 +608,23 @@ CREATE TABLE PRODUCT_PROMO (
 | 2        | Ana García    | Bogotá        | Mouse   | 1   |
 
 -- ✅ Normalizado (3FN): cliente en su tabla, pedido referencia por FK
-CO.CUSTOMERS: customer_id, full_name, city
-CO.ORDERS:    order_id, customer_id (FK), ...
+CO.CUSTOMERS:   customer_id, full_name, city
+CO.ORDERS:      order_id, customer_id (FK), ...
 CO.ORDER_ITEMS: order_id, product_id, quantity`,
           },
         },
         {
           type: 'list',
           items: [
-            'Ventaja: menos redundancia, actualizaciones más seguras, menos espacio.',
-            'Trade-off: más tablas implican más JOINs en consultas — en reporting se a veces desnormaliza a propósito (esquema estrella).',
-            'Para el examen Oracle: conoce la idea y un ejemplo; no necesitas calcular FN formalmente.',
+            'Ventaja: menos redundancia, actualizaciones más seguras.',
+            'Trade-off: más tablas → más JOINs; en reporting a veces se desnormaliza (estrella).',
+            'Para GenO: entiende la idea y un ejemplo; no calcules FN formalmente en una llamada.',
           ],
         },
         {
           type: 'note',
           content:
-            'La desnormalización controlada en data warehouses (SH) es intencional: se sacrifica algo de redundancia por velocidad de consulta. Eso no contradice la normalización en el ERP transaccional (CO).',
+            'La desnormalización en data warehouses (SH) es intencional: se acepta algo de redundancia por velocidad de consulta. El OLTP (CO) sigue normalizado.',
         },
       ],
     },

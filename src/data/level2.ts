@@ -4,53 +4,52 @@ export const level2: ConceptLevel = {
   id: 'nivel-2',
   number: 2,
   title: 'Relaciones entre tablas',
-  subtitle: 'Conectar datos de varias tablas, modificar registros y entender la integridad referencial.',
+  subtitle:
+    'Cómo se conectan clientes, pedidos y productos — y qué implica tocar datos en un ERP.',
   concepts: [
     {
       id: 'claves-primarias-foraneas',
       title: 'Claves primarias y foráneas',
-      summary: 'La clave primaria identifica cada fila de forma única; la foránea conecta tablas y protege la integridad referencial.',
+      summary:
+        'PK identifica la fila; FK conecta tablas y evita pedidos sin cliente.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'En un modelo relacional, cada tabla representa una entidad (clientes, pedidos, productos). La clave primaria (PRIMARY KEY) garantiza que ninguna fila se repita: suele ser un ID numérico o un código de negocio único. La clave foránea (FOREIGN KEY) es una columna que referencia la clave primaria de otra tabla, estableciendo la relación lógica entre entidades.',
+            'En el módulo de ventas, pedidos y clientes viven en tablas distintas. La PK dice "este es el pedido 1001"; la FK dice "este pedido pertenece al cliente 42". Sin esa integridad, aparecen pedidos huérfanos y los reportes dejan de cuadrar — un riesgo que debes poder explicar en lenguaje de negocio.',
         },
         {
           type: 'list',
           items: [
-            'Integridad referencial: no puedes insertar un pedido con cliente_id = 999 si ese cliente no existe.',
-            'ON DELETE CASCADE: al borrar un cliente, sus pedidos se eliminan automáticamente (si está configurado).',
-            'ON DELETE SET NULL: al borrar el registro padre, la FK queda en NULL en los hijos.',
-            'Una tabla puede tener varias FKs: un pedido referencia cliente, vendedor y sucursal.',
+            'Integridad referencial: no insertas un pedido con cliente_id inexistente.',
+            'ON DELETE CASCADE: al borrar el padre, se borran los hijos (si está configurado).',
+            'ON DELETE SET NULL: al borrar el padre, la FK del hijo queda NULL.',
+            'Una tabla puede tener varias FKs: pedido → cliente, vendedor, sucursal.',
           ],
         },
         {
           type: 'code',
           code: {
-            title: 'Definición de tablas relacionadas',
+            title: 'Tablas relacionadas (idea)',
             sql: `CREATE TABLE clientes (
-  cliente_id   NUMBER PRIMARY KEY,
-  nombre       VARCHAR2(100) NOT NULL,
-  ciudad       VARCHAR2(50)
+  cliente_id NUMBER PRIMARY KEY,
+  nombre     VARCHAR2(100) NOT NULL
 );
 
 CREATE TABLE pedidos (
-  pedido_id    NUMBER PRIMARY KEY,
-  cliente_id   NUMBER NOT NULL,
-  monto        NUMBER(12,2),
-  fecha_pedido DATE DEFAULT SYSDATE,
+  pedido_id  NUMBER PRIMARY KEY,
+  cliente_id NUMBER NOT NULL,
+  monto      NUMBER(12,2),
   CONSTRAINT fk_pedido_cliente
-    FOREIGN KEY (cliente_id)
-    REFERENCES clientes(cliente_id)
+    FOREIGN KEY (cliente_id) REFERENCES clientes(cliente_id)
 );`,
           },
         },
         {
           type: 'application',
           application: {
-            title: 'Modelo cliente-pedido en ERP',
-            text: 'El módulo de ventas guarda pedidos en una tabla separada de clientes. La FK cliente_id evita "pedidos huérfanos" y permite JOINs para reportes como "todas las compras del cliente X".',
+            title: 'Por qué un vendedor Oracle lo necesita',
+            text: '"La FK es lo que evita pedidos fantasma. Cuando el cliente pide auditoría y trazabilidad, estás vendiendo integridad referencial — aunque no uses esa frase técnica en la primera slide."',
           },
         },
       ],
@@ -58,20 +57,21 @@ CREATE TABLE pedidos (
     {
       id: 'joins',
       title: 'JOINs: INNER, LEFT y RIGHT',
-      summary: 'Combinar filas de dos o más tablas según una condición de coincidencia en las claves.',
+      summary:
+        'Cruzar tablas para armar el reporte completo: cliente + pedido + producto.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Los JOINs resuelven el problema central de las bases relacionales: la información está dividida en tablas normalizadas. Un JOIN une filas de tablas distintas cuando un valor de la columna A coincide con un valor de la columna B (normalmente PK = FK).',
+            'El reporte de ventas necesita nombre del cliente, número de pedido y producto — datos que viven en tablas distintas. Un JOIN une filas cuando la PK coincide con la FK. INNER muestra solo coincidencias; LEFT incluye también filas de la izquierda sin match (ej. clientes sin pedidos).',
         },
         {
           type: 'list',
           items: [
-            'INNER JOIN — solo filas con coincidencia en ambas tablas. Es el más usado en reportes de ventas completas.',
-            'LEFT JOIN (LEFT OUTER JOIN) — todas las filas de la tabla izquierda; NULL en columnas derechas si no hay match.',
-            'RIGHT JOIN — espejo del LEFT: preserva todas las filas de la derecha.',
-            'FULL OUTER JOIN — ambas tablas completas; NULL donde falte coincidencia (menos frecuente en examen).',
+            'INNER JOIN — solo filas con coincidencia en ambas tablas (ventas completas).',
+            'LEFT JOIN — todas las filas de la izquierda; NULL a la derecha si no hay match.',
+            'RIGHT JOIN — espejo del LEFT: preserva todas las de la derecha.',
+            'FULL OUTER JOIN — ambas tablas completas (menos frecuente en demos ERP).',
           ],
         },
         { type: 'diagram', diagram: 'join-inner' },
@@ -79,15 +79,13 @@ CREATE TABLE pedidos (
         {
           type: 'code',
           code: {
-            title: 'Reporte ventas: cliente → pedido → producto',
-            sql: `-- INNER: solo pedidos que tienen cliente y líneas con producto
-SELECT c.nombre        AS cliente,
+            title: 'INNER: ventas con cliente y producto',
+            sql: `SELECT c.nombre AS cliente,
        p.pedido_id,
-       pr.nombre       AS producto,
-       d.cantidad,
-       d.precio_unitario
+       pr.nombre AS producto,
+       d.cantidad
 FROM   clientes c
-INNER JOIN pedidos p       ON p.cliente_id = c.cliente_id
+INNER JOIN pedidos p        ON p.cliente_id = c.cliente_id
 INNER JOIN detalle_pedido d ON d.pedido_id  = p.pedido_id
 INNER JOIN productos pr     ON pr.producto_id = d.producto_id
 WHERE  p.fecha_pedido >= DATE '2025-01-01';`,
@@ -96,23 +94,20 @@ WHERE  p.fecha_pedido >= DATE '2025-01-01';`,
         {
           type: 'code',
           code: {
-            title: 'LEFT JOIN: clientes sin pedidos',
-            sql: `-- Todos los clientes, incluso los que nunca compraron
-SELECT c.cliente_id,
-       c.nombre,
-       COUNT(p.pedido_id) AS total_pedidos
+            title: 'LEFT: clientes sin pedidos',
+            sql: `SELECT c.nombre, COUNT(p.pedido_id) AS total_pedidos
 FROM   clientes c
 LEFT JOIN pedidos p ON p.cliente_id = c.cliente_id
-GROUP BY c.cliente_id, c.nombre
+GROUP BY c.nombre
 ORDER BY total_pedidos;`,
-            caption: 'Los clientes sin pedidos muestran total_pedidos = 0 gracias al LEFT JOIN.',
+            caption: 'Clientes sin pedidos aparecen con total_pedidos = 0.',
           },
         },
         {
           type: 'application',
           application: {
-            title: 'Análisis de cartera',
-            text: 'Con LEFT JOIN entre clientes y pedidos identificas clientes inactivos (COUNT = 0). Con INNER JOIN analizas solo quienes sí compraron. En ERP, el patrón cliente-pedido-producto es el reporte más repetido.',
+            title: 'En una reunión comercial',
+            text: '"Con INNER analizamos quién sí compró. Con LEFT encontramos cartera inactiva (cero pedidos). Ese es el patrón cliente–pedido–producto que verás en casi toda demo de Oracle Applications o Analytics."',
           },
         },
       ],
@@ -120,93 +115,69 @@ ORDER BY total_pedidos;`,
     {
       id: 'subconsultas',
       title: 'Subconsultas simples y correlacionadas',
-      summary: 'Una consulta dentro de otra: filtra, calcula o alimenta comparaciones con resultados intermedios.',
+      summary:
+        'Una pregunta dentro de otra: comparar contra un promedio o un conjunto intermedio.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'Una subconsulta (subquery) es un SELECT anidado dentro de otra consulta. Puede ir en WHERE, FROM, SELECT o HAVING. Las subconsultas simples se ejecutan una vez y devuelven un resultado independiente. Las correlacionadas referencian columnas de la consulta externa y se re-evalúan fila a fila.',
+            'El analista pide: "productos más caros que el promedio del catálogo." Eso se resuelve con una subconsulta: un SELECT anidado que calcula el promedio y otro que filtra. No necesitas dominar correlacionadas complejas — sí reconocer cuándo el técnico dice "lo resolvemos con una subquery".',
         },
         {
           type: 'list',
           items: [
-            'Subconsulta escalar — devuelve un solo valor (ej. promedio para comparar).',
-            'Subconsulta en IN — filtra donde el valor está en un conjunto de resultados.',
-            'Subconsulta en FROM — actúa como tabla derivada (inline view).',
-            'Subconsulta correlacionada — la inner query usa columnas de la outer query.',
+            'Subconsulta escalar — un solo valor (ej. AVG para comparar).',
+            'IN / NOT IN — el valor está (o no) en un conjunto de resultados.',
+            'EXISTS / NOT EXISTS — "¿existe al menos una fila relacionada?"',
+            'Correlacionada — la interna usa columnas de la externa (más avanzada).',
           ],
         },
         {
           type: 'code',
           code: {
-            title: 'Subconsulta simple en WHERE',
+            title: 'Subconsulta simple',
             sql: `-- Productos con precio superior al promedio
 SELECT producto_id, nombre, precio
 FROM   productos
-WHERE  precio > (
-  SELECT AVG(precio) FROM productos
-);`,
+WHERE  precio > (SELECT AVG(precio) FROM productos);`,
           },
         },
         {
-          type: 'code',
-          code: {
-            title: 'Subconsulta correlacionada',
-            sql: `-- Clientes cuyo último pedido supera su promedio histórico
-SELECT c.cliente_id, c.nombre, p.monto
-FROM   clientes c
-JOIN   pedidos p ON p.cliente_id = c.cliente_id
-WHERE  p.monto > (
-  SELECT AVG(p2.monto)
-  FROM   pedidos p2
-  WHERE  p2.cliente_id = c.cliente_id  -- referencia la fila externa
-)
-AND    p.fecha_pedido = (
-  SELECT MAX(p3.fecha_pedido)
-  FROM   pedidos p3
-  WHERE  p3.cliente_id = c.cliente_id
-);`,
-            caption: 'La subconsulta correlacionada recalcula el promedio para cada cliente distinto.',
+          type: 'application',
+          application: {
+            title: 'Cómo se lo dices a un cliente',
+            text: '"A veces el filtro no es un número fijo: es el resultado de otra pregunta — el promedio, el máximo del mes, la lista de clientes VIP. Eso es una subconsulta: una consulta que alimenta a otra."',
           },
         },
         {
           type: 'note',
           content:
-            'En Oracle, EXISTS y NOT EXISTS suelen ser más eficientes que IN con subconsultas grandes. Para el examen, domina ambas formas.',
-        },
-        {
-          type: 'application',
-          application: {
-            title: 'Detectar productos sin ventas',
-            text: 'Usas NOT IN o NOT EXISTS con subconsulta sobre detalle_pedido para listar productos que nunca aparecieron en un pedido. Es un patrón clásico de auditoría de catálogo.',
-          },
+            'En GenO Comercial basta reconocer el patrón. El equipo técnico elige entre subquery, JOIN o EXISTS según rendimiento.',
         },
       ],
     },
     {
       id: 'dml-delete-truncate-drop',
       title: 'DML básico y DELETE vs TRUNCATE vs DROP',
-      summary: 'INSERT, UPDATE y DELETE modifican datos; TRUNCATE y DROP operan a nivel de estructura con consecuencias distintas.',
+      summary:
+        'Insertar, actualizar y borrar datos — y no confundir vaciar una tabla con destruirla.',
       blocks: [
         {
           type: 'paragraph',
           content:
-            'El DML (Data Manipulation Language) cambia el contenido de las tablas: INSERT agrega filas, UPDATE modifica columnas existentes, DELETE elimina filas que cumplan una condición. TRUNCATE y DROP no son DML estricto — afectan la estructura o vacían la tabla de forma masiva.',
+            'En un proyecto hay datos de prueba, correcciones de precio y limpiezas de staging. INSERT agrega, UPDATE corrige, DELETE borra filas con filtro. TRUNCATE vacía toda la tabla de golpe; DROP elimina la tabla misma. Confundirlos en una conversación con el cliente o el DBA puede sonar a riesgo operativo — por eso el vocabulario importa.',
         },
         {
           type: 'code',
           code: {
             title: 'INSERT, UPDATE, DELETE',
-            sql: `-- Insertar un nuevo cliente
-INSERT INTO clientes (cliente_id, nombre, ciudad)
+            sql: `INSERT INTO clientes (cliente_id, nombre, ciudad)
 VALUES (101, 'Ana García', 'Medellín');
 
--- Actualizar precio con condición
 UPDATE productos
 SET    precio = precio * 1.10
 WHERE  categoria = 'Electrónica';
 
--- Eliminar pedidos cancelados
 DELETE FROM pedidos
 WHERE  estado = 'CANCELADO';`,
           },
@@ -220,42 +191,32 @@ WHERE  estado = 'CANCELADO';`,
             rows: [
               {
                 aspect: 'Qué elimina',
-                optionA: 'Filas que cumplan WHERE (o todas si no hay WHERE)',
+                optionA: 'Filas que cumplan WHERE',
                 optionB: 'TRUNCATE: todas las filas. DROP: la tabla completa',
               },
               {
-                aspect: 'Estructura de tabla',
-                optionA: 'Se conserva (columnas, índices, constraints)',
+                aspect: 'Estructura',
+                optionA: 'Se conserva',
                 optionB: 'TRUNCATE conserva estructura. DROP la destruye',
               },
               {
                 aspect: 'Rollback',
-                optionA: 'Se puede deshacer con ROLLBACK (dentro de transacción)',
-                optionB: 'TRUNCATE: DDL implícito, no siempre rollbackable. DROP: irreversible sin backup',
+                optionA: 'Se puede deshacer (en transacción)',
+                optionB: 'TRUNCATE/DROP: DDL — mucho más riesgoso',
               },
               {
-                aspect: 'Triggers',
-                optionA: 'Dispara triggers DELETE',
-                optionB: 'TRUNCATE no dispara DELETE triggers en Oracle',
-              },
-              {
-                aspect: 'Velocidad',
-                optionA: 'Fila por fila, más lento en tablas grandes',
-                optionB: 'TRUNCATE libera extents, mucho más rápido',
+                aspect: 'Cuándo usarlo',
+                optionA: 'Borrar 3 registros de prueba con filtro',
+                optionB: 'TRUNCATE: vaciar staging. DROP: retirar un objeto obsoleto',
               },
             ],
           },
         },
         {
-          type: 'note',
-          content:
-            'TRUNCATE TABLE nombre_tabla es un DDL. Hace COMMIT implícito en Oracle. DROP TABLE elimina datos, índices, constraints y la definición. Usa DELETE cuando necesitas filtro granular o auditoría fila a fila.',
-        },
-        {
           type: 'application',
           application: {
-            title: 'Limpieza de datos de prueba en ERP',
-            text: 'Para borrar 3 registros de prueba usa DELETE con WHERE. Para vaciar una tabla staging antes de recargar un millón de filas usa TRUNCATE. Para eliminar un módulo obsoleto completo usa DROP (con precaución y backup).',
+            title: 'En una reunión con el equipo técnico',
+            text: '"Si es limpieza selectiva, DELETE. Si es vaciar staging antes de recargar un millón de filas, TRUNCATE. Si es retirar un módulo, DROP — con backup. Así demuestras que entiendes el riesgo sin ejecutar nada."',
           },
         },
       ],

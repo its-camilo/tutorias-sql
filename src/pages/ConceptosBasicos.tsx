@@ -19,10 +19,12 @@ export default function ConceptosBasicos() {
         <p className={styles.eyebrow} aria-hidden="true">
           /* conceptos */
         </p>
-        <h2 className={styles.heading}>De básico a avanzado</h2>
+        <h2 className={styles.heading}>Hablar el idioma de los datos</h2>
         <p className={styles.description}>
-          Referencia estructurada para el examen Oracle: fundamentos teóricos,
-          consultas SQL, modelado dimensional y PL/SQL.
+          Preparación para el perfil Comercial de Generation Oracle (GenO):
+          entiende conceptos SQL y de modelado lo suficiente para conversar con
+          equipos técnicos y explicar valor de negocio a un cliente — sin ser
+          especialista en código.
         </p>
       </header>
 
