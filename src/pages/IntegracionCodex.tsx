@@ -41,7 +41,10 @@ const MCP_JSON_MAC = `{
   "mcpServers": {
     "sqlcl": {
       "command": "/Users/TU_USUARIO/oracle/sqlcl/bin/sql",
-      "args": ["-mcp"]
+      "args": ["-mcp"],
+      "env": {
+        "JAVA_HOME": "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
+      }
     }
   }
 }`
@@ -49,8 +52,11 @@ const MCP_JSON_MAC = `{
 const MCP_JSON_WINDOWS = `{
   "mcpServers": {
     "sqlcl": {
-      "command": "C:\\\\ruta\\\\a\\\\sqlcl\\\\bin\\\\sql.exe",
-      "args": ["-mcp"]
+      "command": "C:\\\\oracle\\\\sqlcl\\\\bin\\\\sql.exe",
+      "args": ["-mcp"],
+      "env": {
+        "JAVA_HOME": "C:\\\\Program Files\\\\Eclipse Adoptium\\\\jdk-21.0.x.x-hotspot"
+      }
     }
   }
 }`
@@ -58,19 +64,28 @@ const MCP_JSON_WINDOWS = `{
 const CODEX_CONFIG_MAC = `[mcp_servers.sqlcl]
 command = "/Users/TU_USUARIO/oracle/sqlcl/bin/sql"
 args = ["-mcp"]
-startup_timeout_ms = 60000`
+startup_timeout_ms = 60000
+
+[mcp_servers.sqlcl.env]
+JAVA_HOME = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"`
 
 const CODEX_CONFIG_WINDOWS = `[mcp_servers.sqlcl]
 command = "C:\\\\oracle\\\\sqlcl\\\\bin\\\\sql.exe"
 args = ["-mcp"]
-startup_timeout_ms = 60000`
+startup_timeout_ms = 60000
+
+[mcp_servers.sqlcl.env]
+JAVA_HOME = "C:\\\\Program Files\\\\Eclipse Adoptium\\\\jdk-21.0.x.x-hotspot"`
 
 const OPENCODE_CONFIG_MAC = `{
   "mcp": {
     "sqlcl": {
       "type": "local",
       "command": ["/Users/TU_USUARIO/oracle/sqlcl/bin/sql", "-mcp"],
-      "enabled": true
+      "enabled": true,
+      "environment": {
+        "JAVA_HOME": "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
+      }
     }
   }
 }`
@@ -80,7 +95,10 @@ const OPENCODE_CONFIG_WINDOWS = `{
     "sqlcl": {
       "type": "local",
       "command": ["C:\\\\oracle\\\\sqlcl\\\\bin\\\\sql.exe", "-mcp"],
-      "enabled": true
+      "enabled": true,
+      "environment": {
+        "JAVA_HOME": "C:\\\\Program Files\\\\Eclipse Adoptium\\\\jdk-21.0.x.x-hotspot"
+      }
     }
   }
 }`
@@ -154,9 +172,7 @@ export default function IntegracionCodex() {
                   para esquemas y datos SH.
                 </>
               ) : (
-                <>
-                  Varios GB para la imagen Docker y los datos SH.
-                </>
+                <>Varios GB para la imagen Docker y los datos SH.</>
               )}
             </li>
             <li>
@@ -165,8 +181,10 @@ export default function IntegracionCodex() {
               que más tarda.
             </li>
             <li>
-              <strong>Requisitos:</strong> Java 17+, SQLcl 25.2+
-              {isMac ? ', Docker o Colima' : ', Docker Desktop'}.
+              <strong>Requisitos:</strong> Java 17+, SQLcl{' '}
+              <strong>25.2+</strong> (guía probada con <strong>25.4+</strong>)
+              {isMac ? ', Docker o Colima' : ', Docker Desktop'}. En SQLcl{' '}
+              <strong>26.x</strong> el guardado de conexiones cambió — ver paso 6.
             </li>
           </ul>
         </div>
@@ -187,14 +205,34 @@ export default function IntegracionCodex() {
             practicar con IA.
           </p>
           <div className={styles.warn}>
-            <span className={styles.warnLabel}>Antes de cada sesión con IA</span>
+            <span className={styles.warnLabel}>
+              Cada vez que reinicies el PC — haz esto ANTES de abrir Codex / Cursor / OpenCode
+            </span>
             <p>
-              El contenedor <strong>oracle-free</strong> debe estar corriendo antes de que Codex,
-              Cursor u OpenCode intenten conectarse vía MCP. Si no, verás{' '}
-              <strong>ORA-12541</strong> o timeout. Los pasos para levantarlo están al final del{' '}
-              <strong>Paso 8</strong>.
+              El contenedor <strong>oracle-free</strong> se apaga al reiniciar. El MCP no puede
+              ejecutarlo por ti. Si no está arriba, verás <strong>ORA-12541</strong> o timeout.
             </p>
           </div>
+          <ShellBlock
+            title={isMac ? 'Arrancar Oracle (macOS)' : 'Arrancar Oracle (Windows)'}
+            code={
+              isMac
+                ? `# 1. Si usas Colima:
+colima status 2>/dev/null || colima start
+
+# 2. Arrancar el contenedor:
+docker start oracle-free
+
+# 3. Esperar listo (30-60 seg):
+docker logs oracle-free 2>&1 | grep "DATABASE IS READY TO USE"`
+                : `# 1. Arrancar el contenedor:
+docker start oracle-free
+
+# 2. Esperar listo (30-60 seg):
+docker logs oracle-free 2>&1 | findstr "DATABASE IS READY TO USE"`
+            }
+            caption="Esquemas CO/SH y datos persisten aunque el contenedor esté apagado. Solo hay que volver a arrancarlo."
+          />
         </header>
 
         <GuideSection step={1} title="Descargar los esquemas CO y SH">
@@ -346,16 +384,13 @@ colima start --cpu 2 --memory 4 --disk 60`}
           />
         </GuideSection>
 
-        <GuideSection step={3} title="Instalar Java 17+ y SQLcl 25.2+">
+        <GuideSection step={3} title="Instalar Java 17+ y SQLcl (25.4+ recomendado)">
           <p className={styles.sectionText}>
-            SQLcl es obligatorio para instalar <strong>SH</strong> (carga datos desde CSV) y
-            para el MCP. Requiere Java 17 o 21.
+            SQLcl es obligatorio para instalar <strong>SH</strong> (carga CSV) y para el MCP.
+            Requiere Java 17 o 21. Esta guía se probó con <strong>SQLcl 25.4+</strong>. El mínimo
+            documentado por Oracle para MCP es 25.2; en <strong>26.x</strong> el guardado de
+            conexiones cambió (paso 6).
           </p>
-          <ShellBlock
-            title="Verificar Java"
-            code={`java -version
-# Debe mostrar 17 o superior`}
-          />
           {isMac ? (
             <>
               <ol className={styles.list}>
@@ -381,7 +416,7 @@ colima start --cpu 2 --memory 4 --disk 60`}
                   >
                     oracle.com/tools/sqlcl
                   </a>{' '}
-                  (versión 25.2 o superior)
+                  (preferible 25.4+)
                 </li>
                 <li>
                   Extrae el ZIP en <strong>~/oracle/sqlcl</strong>
@@ -390,7 +425,6 @@ colima start --cpu 2 --memory 4 --disk 60`}
                   Añade <strong>~/oracle/sqlcl/bin</strong> al PATH o usa la ruta absoluta
                 </li>
               </ol>
-              <ShellBlock title="Verificar SQLcl" code="~/oracle/sqlcl/bin/sql -version" />
             </>
           ) : (
             <>
@@ -415,7 +449,8 @@ colima start --cpu 2 --memory 4 --disk 60`}
                     className={styles.link}
                   >
                     oracle.com/tools/sqlcl
-                  </a>
+                  </a>{' '}
+                  (preferible 25.4+)
                 </li>
                 <li>
                   Extrae en <strong>C:\oracle\sqlcl</strong>
@@ -424,15 +459,56 @@ colima start --cpu 2 --memory 4 --disk 60`}
                   Añade <strong>C:\oracle\sqlcl\bin</strong> al PATH del sistema
                 </li>
               </ol>
-              <ShellBlock title="Verificar en PowerShell" code="sql -version" />
             </>
           )}
+          <p className={styles.sectionText}>
+            <strong>Chequeo previo de entorno</strong> (hazlo siempre antes de instalar CO/SH):
+          </p>
+          <ShellBlock
+            title={isMac ? 'Verificar entorno (macOS)' : 'Verificar entorno (Windows)'}
+            code={
+              isMac
+                ? `docker --version
+java -version
+sql -version
+# o: ~/oracle/sqlcl/bin/sql -version
+
+# Confirma que el puerto 1521 no esté ocupado por otro contenedor:
+docker ps`
+                : `docker --version
+java -version
+sql -version
+
+# Confirma que el puerto 1521 no esté ocupado por otro contenedor:
+docker ps`
+            }
+            caption="Si docker ps muestra otro proceso usando 1521, deténlo o cambia el mapeo de puertos antes de continuar."
+          />
         </GuideSection>
 
-        <GuideSection step={4} title="Instalar el esquema CO (Customer Orders)">
+        <GuideSection step={4} title="Validar FREEPDB1 e instalar CO">
           <p className={styles.sectionText}>
-            Conéctate como usuario privilegiado (<strong>system</strong>) y ejecuta el script
-            de instalación desde la carpeta <strong>customer_orders</strong>.
+            Antes de instalar esquemas, confirma que el listener y el PDB responden. Si esto
+            falla, no ejecutes <strong>co_install.sql</strong>.
+          </p>
+          <ShellBlock
+            title="Probar conexión a FREEPDB1"
+            code={
+              isMac
+                ? `sql system/TuPasswordSeguro123@//localhost:1521/FREEPDB1
+SELECT name FROM v$database;
+SELECT 1 FROM dual;
+exit`
+                : `sql system/TuPasswordSeguro123@//localhost:1521/FREEPDB1
+SELECT name FROM v$database;
+SELECT 1 FROM dual;
+exit`
+            }
+            caption="Si conecta y responde, el PDB está listo. Sustituye la contraseña por la de Docker."
+          />
+          <p className={styles.sectionText}>
+            Luego instala <strong>CO</strong> desde <strong>customer_orders</strong> como{' '}
+            <strong>system</strong>:
           </p>
           <ShellBlock
             title={isMac ? 'Instalar CO (macOS)' : 'Instalar CO (Windows)'}
@@ -451,18 +527,13 @@ sql system/TuPasswordSeguro123@//localhost:1521/FREEPDB1
                 : 'Sustituye la contraseña de system por la que usaste en Docker.'
             }
           />
-          <p className={styles.sectionText}>
-            Al final deberías ver un mensaje de instalación exitosa. Verifica con SQLcl o sin
-            él:
-          </p>
           <CodeBlock
-            title="Consulta de prueba CO (SQLcl)"
+            title="Consulta de prueba CO"
             sql="SELECT COUNT(*) AS clientes FROM CO.CUSTOMERS;"
           />
           <ShellBlock
             title="Verificar CO sin SQLcl"
             code={`docker exec oracle-free sql system/TuPasswordSeguro123@FREEPDB1 -S "SELECT COUNT(*) FROM CO.CUSTOMERS;"`}
-            caption="Útil si SQLcl falla pero quieres confirmar que CO quedó instalado."
           />
         </GuideSection>
 
@@ -484,7 +555,7 @@ sql system/TuPasswordSeguro123@//localhost:1521/FREEPDB1
             }
             caption={
               isMac
-                ? 'Puede tardar varios minutos por el volumen de datos. Elige password para SH (ej. ShPass123).'
+                ? 'Puede tardar varios minutos. Elige password para SH (ej. ShPass123).'
                 : undefined
             }
           />
@@ -499,19 +570,17 @@ sql system/TuPasswordSeguro123@//localhost:1521/FREEPDB1
           </div>
           <p className={styles.sectionText}>
             <strong>Opción A — Ignorar el error (suficiente para la tutoría):</strong> todas las
-            tablas SH se crean igual; solo falla ese índice textual. Los ejercicios de{' '}
-            <strong>SH.SALES</strong>, <strong>SH.TIMES</strong>, etc. funcionan con normalidad.
+            tablas SH se crean igual; solo falla ese índice textual.
           </p>
           <p className={styles.sectionText}>
-            <strong>Opción B — Habilitar Oracle Text:</strong> conéctate como SYSDBA dentro del
-            contenedor y ejecuta el script de instalación de Text:
+            <strong>Opción B — Habilitar Oracle Text:</strong>
           </p>
           <ShellBlock
             title="Habilitar Oracle Text (opcional)"
             code={`docker exec -it oracle-free bash
 sqlplus / as sysdba
 @$ORACLE_HOME/ctx/admin/catctx.sql`}
-            caption="Solo si necesitas el índice de texto. Para los ejercicios de esta tutoría no es obligatorio."
+            caption="Solo si necesitas el índice de texto. Para esta tutoría no es obligatorio."
           />
           <CodeBlock
             title="Consulta de prueba SH"
@@ -524,47 +593,75 @@ sqlplus / as sysdba
           />
         </GuideSection>
 
-        <GuideSection step={6} title="Guardar la conexión local en SQLcl">
-          <p className={styles.sectionText}>
-            El MCP de SQLcl <strong>no acepta credenciales en el chat</strong>. Debes guardar
-            la conexión con nombre y contraseña almacenada. El flag{' '}
-            <strong>-name</strong> define el identificador que la IA usará con{' '}
-            <strong>connect</strong> ([documentación Oracle](https://docs.oracle.com/en/database/oracle/sql-developer-command-line/25.4/sqcug/preparing-your-environment.html)).
-          </p>
-          <ShellBlock
-            title="Guardar conexión"
-            code={`sql -name co_local -save -savepwd system/TuPasswordSeguro123@//localhost:1521/FREEPDB1`}
-            caption="co_local es el nombre exacto que pedirás al MCP: connect a co_local. Credenciales en ~/.dbtools"
-          />
-          <ShellBlock
-            title="Listar conexiones guardadas"
-            code={`connmgr list
-# En SQLcl 26.x: connmgr list (sin guión extra)`}
-          />
-          <p className={styles.sectionText}>
-            Deberías ver <strong>co_local</strong> en la lista antes de configurar el MCP.
-          </p>
+        <GuideSection step={6} title="Conexión para el MCP (SQLcl 25.x vs 26.x)">
           <div className={styles.note}>
-            <span className={styles.noteLabel}>Permisos CO/SH</span>
+            <span className={styles.noteLabel}>Dos nombres distintos — no los mezcles</span>
             <p>
-              Conectas como <strong>system</strong> para ver todos los esquemas. En los
-              ejercicios usarás <strong>CO.tabla</strong> y <strong>SH.tabla</strong> con
-              prefijo de esquema, igual que en FreeSQL.
+              <strong>Servidor MCP</strong> = <strong>sqlcl</strong> (cómo se llama el tool en
+              Codex/Cursor/OpenCode).{' '}
+              <strong>Conexión guardada</strong> = <strong>co_local</strong> (solo si usas SQLcl
+              ≤25.x con <code>-save</code>). Cuando digas &quot;conéctate a co_local&quot;, te
+              refieres a la conexión, no al nombre del servidor MCP.
             </p>
           </div>
+
+          <h3 className={styles.subsectionTitle}>Opción A — SQLcl 25.x (incluye 25.4)</h3>
+          <p className={styles.sectionText}>
+            En 25.x puedes guardar la conexión con contraseña. El MCP no acepta credenciales en
+            el chat; usa la conexión guardada.
+          </p>
+          <ShellBlock
+            title="Guardar conexión (solo SQLcl ≤25.x)"
+            code={`sql -name co_local -save -savepwd system/TuPasswordSeguro123@//localhost:1521/FREEPDB1`}
+            caption="co_local es el nombre que usarás con connect. Credenciales en ~/.dbtools"
+          />
+          <ShellBlock
+            title="Listar conexiones"
+            code={`connmgr list`}
+          />
+          <div className={styles.warn}>
+            <span className={styles.warnLabel}>Compatibilidad</span>
+            <p>
+              <strong>
+                <code>-name … -save -savepwd</code> solo funciona en SQLcl ≤25.x.
+              </strong>{' '}
+              En SQLcl <strong>26.x</strong> ese método ya no funciona (
+              <code>-save</code> fue eliminado). No pierdas tiempo con{' '}
+              <code>connmgr add</code> / JSON manuales: en 26 no reemplazan este flujo de forma
+              sencilla. Usa la opción B.
+            </p>
+          </div>
+
+          <h3 className={styles.subsectionTitle}>Opción B — SQLcl 26.x (cadena directa en el chat)</h3>
+          <p className={styles.sectionText}>
+            No dependas de <strong>co_local</strong>. Pídele al agente que se conecte con la
+            cadena completa (sustituye la contraseña):
+          </p>
+          <div className={styles.promptCard}>
+            <p className={styles.promptTitle}>Prompt de conexión (SQLcl 26)</p>
+            <p className={styles.promptText}>
+              {`Conéctate con el MCP sqlcl a system/"TuPasswordSeguro123"@//localhost:1521/FREEPDB1`}
+            </p>
+          </div>
+          <p className={styles.sectionText}>
+            Si tu contraseña tiene caracteres especiales, déjala entre comillas como en el
+            ejemplo. Luego pide <code>SELECT 1 FROM dual;</code> para verificar.
+          </p>
         </GuideSection>
 
         <GuideSection step={7} title="Configurar SQLcl MCP en tu cliente de IA">
           <p className={styles.sectionText}>
-            El servidor MCP debe llamarse <strong>sqlcl</strong> (minúsculas). Usa la{' '}
-            <strong>ruta absoluta</strong> al binario <strong>sql</strong>. Tras guardar la
-            configuración, <strong>reinicia el cliente</strong> (Codex, Cursor u OpenCode).
+            El <strong>servidor MCP</strong> debe llamarse <strong>sqlcl</strong> (minúsculas).
+            Usa la <strong>ruta absoluta</strong> al binario <strong>sql</strong>. Incluye{' '}
+            <strong>JAVA_HOME</strong> en <code>env</code>: sin eso el MCP puede fallar aunque{' '}
+            <code>java -version</code> funcione en tu terminal. Tras guardar,{' '}
+            <strong>reinicia el cliente</strong>.
           </p>
 
           <h3 className={styles.subsectionTitle}>Codex (OpenAI)</h3>
           <p className={styles.sectionText}>
-            Archivo: <strong>~/.codex/config.toml</strong> (o desde la extensión Codex → ⚙️ →
-            MCP Settings → Open config.toml). Documentación:{' '}
+            Archivo: <strong>~/.codex/config.toml</strong> (o extensión Codex → ⚙️ → MCP Settings
+            → Open config.toml). Docs:{' '}
             <a
               href="https://developers.openai.com/codex/mcp"
               target="_blank"
@@ -580,27 +677,26 @@ sqlplus / as sysdba
             code={isMac ? CODEX_CONFIG_MAC : CODEX_CONFIG_WINDOWS}
             caption={
               isMac
-                ? 'Sustituye TU_USUARIO. Reinicia VS Code o la extensión Codex.'
-                : 'Ajusta la ruta a tu instalación de SQLcl. Reinicia VS Code o la extensión Codex.'
+                ? 'Ajusta la ruta de sql y JAVA_HOME (puedes obtenerla con /usr/libexec/java_home). Reinicia Codex.'
+                : 'Ajusta la ruta de sql.exe y JAVA_HOME a tu JDK real. Reinicia Codex.'
             }
           />
 
           <h3 className={styles.subsectionTitle}>Cursor</h3>
           <p className={styles.sectionText}>
-            <strong>Settings → Tools & MCP → Add MCP server</strong>, o edita el archivo
-            manualmente ([guía Cursor + SQLcl](https://oracle-mcp.mintlify.app/clients/cursor)).
-            Archivo:{' '}
+            Settings → Tools & MCP → Add MCP server, o edita{' '}
             <strong>
               {isMac ? '~/.cursor/mcp.json' : '%USERPROFILE%\\.cursor\\mcp.json'}
             </strong>
+            .
           </p>
           <ShellBlock
             title={isMac ? 'mcp.json (macOS)' : 'mcp.json (Windows)'}
             code={isMac ? MCP_JSON_MAC : MCP_JSON_WINDOWS}
             caption={
               isMac
-                ? 'Sustituye TU_USUARIO por tu usuario de macOS.'
-                : 'Usa doble barra invertida en la ruta. Ejemplo: C:\\\\oracle\\\\sqlcl\\\\bin\\\\sql.exe'
+                ? 'Sustituye TU_USUARIO y la ruta JAVA_HOME.'
+                : 'Doble barra en rutas Windows. Ajusta JAVA_HOME a tu JDK.'
             }
           />
 
@@ -611,41 +707,51 @@ sqlplus / as sysdba
           <ShellBlock
             title={isMac ? 'OpenCode (macOS)' : 'OpenCode (Windows)'}
             code={isMac ? OPENCODE_CONFIG_MAC : OPENCODE_CONFIG_WINDOWS}
-            caption='Bloque "mcp" con type "local". Reinicia OpenCode tras guardar.'
+            caption='Bloque "mcp" con type "local" + JAVA_HOME. Reinicia OpenCode.'
           />
 
           <div className={styles.note}>
-            <span className={styles.noteLabel}>Común a todos los clientes</span>
+            <span className={styles.noteLabel}>Recordatorio de nombres</span>
             <p>
-              Nombre del servidor: <strong>sqlcl</strong>. Ruta absoluta al binario. Reinicio
-              obligatorio. En el panel MCP deberías ver <strong>sqlcl</strong> activo antes de
-              abrir un chat nuevo.
+              En el panel MCP verás el servidor <strong>sqlcl</strong>. La conexión a la base es{' '}
+              <strong>co_local</strong> (25.x) o la cadena{' '}
+              <strong>system/…@//localhost:1521/FREEPDB1</strong> (26.x).
             </p>
           </div>
         </GuideSection>
 
-        <GuideSection step={8} title="Verificar MCP y practicar ejercicios">
+        <GuideSection step={8} title="Probar el MCP y practicar ejercicios">
           <p className={styles.sectionText}>
-            Abre un <strong>chat nuevo</strong> en tu cliente (Codex, Cursor u OpenCode). Prueba
-            en este orden y aprueba cada herramienta cuando te lo pida:
+            Abre un <strong>chat nuevo</strong>. Primero una prueba mínima (separa “MCP no
+            carga” de “consulta mal escrita”), luego los ejercicios.
           </p>
+
+          <h3 className={styles.subsectionTitle}>Prueba mínima del MCP</h3>
           <div className={styles.promptCard}>
             <p className={styles.promptTitle}>1. Conectar</p>
             <p className={styles.promptText}>
-              Usa el MCP de SQLcl para conectarte a la conexión guardada{' '}
-              <strong>co_local</strong>.
+              {`SQLcl 25.x: Usa el MCP sqlcl y conéctate a la conexión guardada co_local.
+
+SQLcl 26.x: Usa el MCP sqlcl y conéctate a system/"TuPasswordSeguro123"@//localhost:1521/FREEPDB1`}
             </p>
           </div>
           <div className={styles.promptCard}>
-            <p className={styles.promptTitle}>2. Listar tablas CO</p>
-            <p className={styles.promptText}>
-              Ejecuta: SELECT table_name FROM all_tables WHERE owner = 'CO' ORDER BY 1;
-            </p>
+            <p className={styles.promptTitle}>2. Smoke test</p>
+            <p className={styles.promptText}>Ejecuta: SELECT 1 FROM dual;</p>
           </div>
           <div className={styles.promptCard}>
-            <p className={styles.promptTitle}>3. Ejercicio de la tutoría</p>
+            <p className={styles.promptTitle}>3. Catálogo</p>
             <p className={styles.promptText}>
-              {`Estoy practicando tutorías SQL. Usa el MCP de SQLcl conectado a co_local y ejecuta el paso actual del ejercicio Clientes VIP:
+              Ejecuta: SELECT table_name FROM all_tables WHERE owner = &apos;CO&apos; ORDER BY
+              1;
+            </p>
+          </div>
+
+          <h3 className={styles.subsectionTitle}>Practicar ejercicios</h3>
+          <div className={styles.promptCard}>
+            <p className={styles.promptTitle}>Ejercicio VIP</p>
+            <p className={styles.promptText}>
+              {`Estoy practicando tutorías SQL. Usa el MCP sqlcl (ya conectado) y ejecuta:
 
 SELECT c.FULL_NAME,
        SUM(oi.UNIT_PRICE * oi.QUANTITY) AS total_compras
@@ -656,60 +762,20 @@ GROUP BY c.FULL_NAME
 HAVING SUM(oi.UNIT_PRICE * oi.QUANTITY) > 1000
 ORDER BY total_compras DESC;
 
-Explícame el resultado.`}
+Explícame el resultado en lenguaje comercial.`}
             </p>
           </div>
           <div className={styles.promptCard}>
-            <p className={styles.promptTitle}>4. Explicar PL/SQL (lectura)</p>
+            <p className={styles.promptTitle}>PL/SQL (solo lectura)</p>
             <p className={styles.promptText}>
-              {`Usa SQLcl MCP. Muestra el bloque PL/SQL del ejercicio de reconocimiento (CUSTOMER_ID = 5) y explícame en lenguaje comercial qué hace, sin reescribirlo.`}
+              {`Usa el MCP sqlcl. Muestra el bloque PL/SQL del ejercicio de reconocimiento (CUSTOMER_ID = 5) y explícame en lenguaje comercial qué hace, sin reescribirlo.`}
             </p>
           </div>
           <div className={styles.note}>
             <span className={styles.noteLabel}>Flujo recomendado</span>
             <p>
-              Ve a la sección <strong>Ejercicio</strong> → lee el paso del carrusel → pídele a la
-              IA que lo ejecute con SQLcl MCP → revisa el resultado → siguiente paso.
-            </p>
-          </div>
-          <div className={styles.warn}>
-            <span className={styles.warnLabel}>Requisito antes de usar el MCP</span>
-            <p>
-              El contenedor Oracle debe estar corriendo <strong>antes</strong> de que cualquier
-              agente IA intente conectarse vía MCP. Ejecuta estos pasos en la terminal cada vez
-              que reinicies el equipo o hayas apagado el contenedor:
-            </p>
-          </div>
-          <ShellBlock
-            title={isMac ? 'Levantar Oracle (macOS con Colima)' : 'Levantar Oracle (Windows)'}
-            code={
-              isMac
-                ? `# 1. Si usas Colima:
-colima status 2>/dev/null || colima start
-
-# 2. Arrancar el contenedor Oracle:
-docker start oracle-free
-
-# 3. Esperar a que esté listo (30-60 seg):
-docker logs oracle-free 2>&1 | grep "DATABASE IS READY TO USE"`
-                : `# 1. Arrancar el contenedor Oracle:
-docker start oracle-free
-
-# 2. Esperar a que esté listo (30-60 seg):
-docker logs oracle-free 2>&1 | findstr "DATABASE IS READY TO USE"`
-            }
-          />
-          <p className={styles.sectionText}>
-            Si el contenedor no está levantado, el MCP de SQLcl arranca pero falla con{' '}
-            <strong>ORA-12541: TNS:no listener</strong> o timeout. El MCP no puede ejecutar{' '}
-            <strong>docker</strong> en tu máquina: debes levantar Oracle tú manualmente.
-          </p>
-          <div className={styles.note}>
-            <span className={styles.noteLabel}>Los datos persisten</span>
-            <p>
-              Si reinicias el sistema, los contenedores se detienen y hay que repetir los pasos de
-              arriba. La conexión guardada (<strong>co_local</strong>), los esquemas CO/SH y los
-              datos siguen en el volumen del contenedor aunque esté apagado.
+              Arranca Oracle (bloque del inicio) → chat nuevo → prueba mínima → sección{' '}
+              <strong>Ejercicio</strong> → carrusel → pide a la IA que ejecute con MCP.
             </p>
           </div>
         </GuideSection>
@@ -719,51 +785,64 @@ docker logs oracle-free 2>&1 | findstr "DATABASE IS READY TO USE"`
             {isMac && (
               <li>
                 <strong>Sin RAM / Mac lento</strong> — Usa Colima con{' '}
-                <strong>--memory 4</strong>. Cierra navegador y otras apps. La imagen{' '}
-                <strong>23-slim</strong> reduce descarga y arranque.
+                <strong>--memory 4</strong>. Cierra otras apps. Imagen{' '}
+                <strong>23-slim</strong> reduce descarga.
               </li>
             )}
             <li>
-              <strong>ORA-12541 / connection refused</strong> — El contenedor aún no está
-              listo. Revisa <strong>docker logs oracle-free</strong> hasta ver DATABASE IS
-              READY. Prueba el <strong>docker exec</strong> del paso 2.
+              <strong>ORA-12541 / connection refused</strong> — Contenedor apagado o no listo.
+              Ejecuta <strong>docker start oracle-free</strong> y revisa los logs hasta DATABASE
+              IS READY.
             </li>
             <li>
-              <strong>SQLcl no conecta pero Oracle sí</strong> — Usa{' '}
-              <strong>docker exec oracle-free sql ...</strong> para aislar si el problema es
-              SQLcl o la base.
+              <strong>ORA-01017 invalid username/password</strong> — Contraseña incorrecta o
+              conexión guardada desactualizada. Regenera / vuelve a guardar en 25.x, o usa la
+              cadena directa del paso 6 (opción B) en 26.x.
             </li>
             <li>
-              <strong>ORA-29833 en SH</strong> — Normal en Database Free. Ignóralo o ejecuta{' '}
-              <strong>catctx.sql</strong> como SYSDBA (paso 5).
+              <strong>ORA-28009</strong> — Intentaste conectar como <strong>SYS</strong> sin{' '}
+              <strong>AS SYSDBA</strong>. Para esta guía usa <strong>system</strong> hacia
+              FREEPDB1, no SYS.
             </li>
             <li>
-              <strong>sh_install.sql falla</strong> — Debe ejecutarse con <strong>SQLcl</strong>,
-              no SQL*Plus. Verifica <strong>sql -version</strong> ≥ 25.2.
+              <strong>Puerto 1521 ocupado</strong> — <strong>docker ps</strong>; detén el otro
+              contenedor o cambia el mapeo <code>-p</code>.
             </li>
             <li>
-              <strong>sqlcl no aparece en el cliente</strong> — JSON/TOML válido, ruta absoluta,
-              nombre <strong>sqlcl</strong> en minúsculas, reinicia el cliente.
+              <strong>SQLcl no conecta pero Oracle sí</strong> — Prueba{' '}
+              <strong>docker exec oracle-free sql …</strong> para aislar el fallo.
             </li>
             <li>
-              <strong>MCP no conecta / pide password</strong> — Recrea con{' '}
-              <strong>-name co_local -save -savepwd</strong>. Verifica con{' '}
-              <strong>connmgr list</strong>.
+              <strong>ORA-29833 en SH</strong> — Normal en Database Free; ignóralo o ejecuta{' '}
+              <strong>catctx.sql</strong> (paso 5).
             </li>
             <li>
-              <strong>ORA- sobre permisos en CO/SH</strong> — Usa prefijo de esquema:{' '}
+              <strong>sh_install.sql falla</strong> — Debe ser con <strong>SQLcl</strong>, no
+              SQL*Plus. Verifica <strong>sql -version</strong>.
+            </li>
+            <li>
+              <strong>-save no funciona / co_local vacío</strong> — Estás en SQLcl 26.x. Usa
+              conexión por cadena (paso 6, opción B).
+            </li>
+            <li>
+              <strong>sqlcl no aparece / falla al arrancar</strong> — JSON/TOML válido, ruta
+              absoluta, nombre <strong>sqlcl</strong>, <strong>JAVA_HOME</strong> en{' '}
+              <code>env</code>, reinicia el cliente.
+            </li>
+            <li>
+              <strong>ORA- sobre permisos CO/SH</strong> — Usa prefijos{' '}
               <strong>CO.CUSTOMERS</strong>, <strong>SH.SALES</strong>.
             </li>
             <li>
-              <strong>TNS / alias no encontrado</strong> — Si usas TNS en lugar de cadena
-              EZConnect, añade <strong>TNS_ADMIN</strong> en el bloque <strong>env</strong> de
-              la configuración MCP.
+              <strong>TNS / alias no encontrado</strong> — Añade <strong>TNS_ADMIN</strong> en el
+              bloque <code>env</code> del MCP, o usa EZConnect (
+              <code>//localhost:1521/FREEPDB1</code>).
             </li>
           </ul>
           <div className={styles.warn}>
             <span className={styles.warnLabel}>Sin instalar Oracle</span>
             <p>
-              Si no quieres montar nada local, practica en{' '}
+              Practica en{' '}
               <a
                 href="https://freesql.com"
                 target="_blank"
